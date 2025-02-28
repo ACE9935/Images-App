@@ -207,4 +207,34 @@ public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file,
 
 }
 
+    @RequestMapping(value = "/images/{id}/similar", method = RequestMethod.GET, produces = "application/json; charset=UTF-8")
+    public ResponseEntity<ArrayNode> getImageListSortedBySimilarity(
+            @PathVariable("id") long id,
+            @RequestParam(value = "number", defaultValue = "5") int number,
+            @RequestParam(value = "descriptor") String descriptor) {
+
+        if (!descriptor.equals("histogram_2d") && !descriptor.equals("histogram_3d")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(null);
+        }
+
+        List<ImageMetadata> images = imageRepository.getSortedImagesMetaIndexes(id, number, descriptor);
+
+        if (images.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null); 
+        }
+
+        ArrayNode nodes = mapper.createArrayNode();
+        for (ImageMetadata image : images) {
+            ObjectNode node = mapper.createObjectNode();
+            node.put("id", image.getId());
+            node.put("name", image.getName());
+            node.put("type", image.getFormat());
+            nodes.add(node);
+        }
+
+        return ResponseEntity.ok(nodes); // 200 OK
+    }
+
 }

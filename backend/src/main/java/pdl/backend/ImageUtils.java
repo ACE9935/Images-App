@@ -120,4 +120,27 @@ public class ImageUtils {
             System.out.println("Error while deleting the image.");
         }
     }
+
+    public static double euclideanDistance2D(int[][] hist1, int[][] hist2) {
+        double sum = 0.0;
+        for (int i = 0; i < hist1.length; i++) {
+            for (int j = 0; j < hist1[i].length; j++) {
+                sum += Math.pow(hist1[i][j] - hist2[i][j], 2);
+            }
+        }
+        return Math.sqrt(sum);
+    }
+
+    public static double euclideanDistance3D(int[][][] hist1, int[][][] hist2) {
+        double sum = 0.0;
+        for (int i = 0; i < hist1.length; i++) {
+            for (int j = 0; j < hist1[i].length; j++) {
+                for (int k = 0; k < hist1[i][j].length; k++) {
+                    sum += Math.pow(hist1[i][j][k] - hist2[i][j][k], 2);
+                }
+            }
+        }
+        return Math.sqrt(sum);
+    }
+
 }
