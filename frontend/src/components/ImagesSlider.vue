@@ -45,7 +45,7 @@ onMounted(() => {
     <img
       v-for="(image, index) in images"
       :key="index"
-      :src="'http://localhost:8001/imagesToVisualize/' + image.id"
+      :src="'/images/visualize/' + image.id"
       @click="selectImage(image.id)"
       alt="Image Preview"
       :class="{

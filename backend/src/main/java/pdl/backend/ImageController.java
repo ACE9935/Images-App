@@ -135,7 +135,7 @@ public ResponseEntity<?> getImageMetaData(@PathVariable("id") long id) {
     }
 }
 
-  @RequestMapping(value = "/imagesToVisualize/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+  @RequestMapping(value = "/images/visualize/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
   public ResponseEntity<?> getImage(@PathVariable("id") long id) {
 
    Optional<Image> optionalImage = imageDao.retrieve(id);

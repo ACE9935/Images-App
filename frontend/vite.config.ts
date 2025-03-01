@@ -12,7 +12,7 @@ export default defineConfig({
     proxy: {
       '^/images': {
         target: 'http://localhost:8001' // Spring boot backend address
-      }
+      },
     }
   }
 })

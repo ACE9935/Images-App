@@ -12,7 +12,7 @@ export const fetchImages = async () => {
 
 // Fetch a single image by ID
 export const fetchImageById = async (id: string) => {
-    const response = await apiClient.get(`/${id}`, { responseType: "blob" });
+    const response = await apiClient.get(`/visualize/${id}`, { responseType: "blob" });
     return response.data;
 };
 
