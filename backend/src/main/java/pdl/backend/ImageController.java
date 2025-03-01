@@ -46,18 +46,22 @@ import pdl.backend.ImageRepository;
 import pdl.backend.ImageUtils;
 import pdl.backend.ImageIndex;
 import pdl.backend.ImageMetadata;
+import pdl.backend.ImageDao;
+import pdl.backend.Image;
 
 @RestController
 public class ImageController {
 
     @Autowired
     private ObjectMapper mapper;
+    private final ImageDao imageDao;
     private ImageRepository imageRepository;
 
     @Autowired
     public ImageController(ImageRepository imageRepository) {
 
         this.imageRepository = imageRepository;
+        this.imageDao = new ImageDao();
 
         try {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
@@ -95,6 +99,8 @@ public class ImageController {
 
                 ImageIndex imageIndex = new ImageIndex(filename, width, height, resourceFormat, histogram2D, histogram3D);
                 imageIndexesToUpload.add(imageIndex);
+                Image newImage = new Image(fileContent);
+                imageDao.create(newImage);
             }
 
             // Upload the initial image indexes to the DB
@@ -129,6 +135,22 @@ public ResponseEntity<?> getImageMetaData(@PathVariable("id") long id) {
     }
 }
 
+  @RequestMapping(value = "/imagesToVisualize/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+  public ResponseEntity<?> getImage(@PathVariable("id") long id) {
+
+   Optional<Image> optionalImage = imageDao.retrieve(id);
+
+    if (optionalImage.isPresent()) {
+        Image imgFile = optionalImage.get();
+        byte[] imageData = imgFile.getData();
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(imageData); 
+    } else {
+        return new ResponseEntity<>("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+  }
 
     @RequestMapping(value = "/images/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteImage(@PathVariable("id") long id) {
@@ -138,6 +160,8 @@ public ResponseEntity<?> getImageMetaData(@PathVariable("id") long id) {
 
         if (imageMetaData != null) {
             imageRepository.deleteImageIndex(id);
+             Optional<Image> imageOptional = imageDao.retrieve(id);
+             imageDao.delete(imageOptional.get());
             return new ResponseEntity<>("Image deleted successfully from DB", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Image not found", HttpStatus.NOT_FOUND);
@@ -175,6 +199,8 @@ public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file,
         ImageIndex imageIndex = new ImageIndex(filename, image.getWidth(), image.getHeight(), contentType, histogram2D, histogram3D);
 
         imageRepository.addImageMetaData(imageIndex);
+        Image newImage = new Image(fileBytes);
+        imageDao.create(newImage);
 
     } catch (IOException e) {
         e.printStackTrace();

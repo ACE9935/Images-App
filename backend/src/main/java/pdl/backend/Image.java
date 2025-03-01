@@ -1,0 +1,20 @@
+package pdl.backend;
+
+public class Image {
+  private static Long count = Long.valueOf(0);
+  private Long id;
+  private byte[] data;
+
+  public Image(final byte[] data) {
+    id = count++;
+    this.data = data;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public byte[] getData() {
+    return data;
+  }
+}
