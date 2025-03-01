@@ -6,10 +6,17 @@ public class ImageIndex extends ImageMetadata {
     private int[][] histogram_2d;
     private int[][][] histogram_3d;
 
-    // Constructor
     public ImageIndex(final String name, final int width, final int height, final String format, final int[][] data_2d, final int[][][] data_3d) {
 
         super(count++, width, height, name, format);
+
+        this.histogram_2d = data_2d;
+        this.histogram_3d = data_3d;
+    }
+
+    public ImageIndex(long id, final String name, final int width, final int height, final String format, final int[][] data_2d, final int[][][] data_3d) {
+
+        super(id, width, height, name, format);
 
         this.histogram_2d = data_2d;
         this.histogram_3d = data_3d;

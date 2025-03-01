@@ -78,7 +78,7 @@ public class ImageUtils {
                 float[] hsv = new float[3];
                 ColorHsv.rgbToHsv(r, g, b, hsv);
                 int pixelHue = (int) hsv[0];
-                int pixelSaturation = (int) (hsv[1] * 99); // Scale saturation to 0-99
+                int pixelSaturation = (int) (hsv[1] * 99);
 
                 histogram[pixelHue][pixelSaturation]++;
             }

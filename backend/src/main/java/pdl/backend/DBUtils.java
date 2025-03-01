@@ -3,8 +3,11 @@ package pdl.backend;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.nio.BufferUnderflowException;
 
 public class DBUtils {
 
@@ -24,30 +27,18 @@ public static byte[] serialize3D(int[][][] histogram) throws IOException {
     }
 }
 
-    public static int[][] deserialize2D(byte[] bytes, int width, int height) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        int[][] histogram = new int[width][height];
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                histogram[i][j] = buffer.getInt();
-            }
+    public static int[][] deserialize2D(byte[] bytes) throws IOException, ClassNotFoundException {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+            return (int[][]) objectInputStream.readObject();
         }
-        return histogram;
     }
 
-    public static int[][][] deserialize3D(byte[] bytes, int xBins, int yBins, int zBins) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        int[][][] histogram = new int[xBins][yBins][zBins];
-
-        for (int i = 0; i < xBins; i++) {
-            for (int j = 0; j < yBins; j++) {
-                for (int k = 0; k < zBins; k++) {
-                    histogram[i][j][k] = buffer.getInt();
-                }
-            }
+    public static int[][][] deserialize3D(byte[] bytes) throws IOException, ClassNotFoundException{
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+            return (int[][][]) objectInputStream.readObject();
         }
-        return histogram;
     }
 }
 

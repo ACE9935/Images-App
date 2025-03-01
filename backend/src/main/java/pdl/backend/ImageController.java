@@ -234,7 +234,8 @@ public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file,
             nodes.add(node);
         }
 
-        return ResponseEntity.ok(nodes); // 200 OK
+        return ResponseEntity.status(HttpStatus.OK)
+                    .body(nodes); 
     }
 
 }

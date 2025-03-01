@@ -24,46 +24,23 @@ public class ImageRepository {
   private JdbcTemplate jdbcTemplate;
 
 public void setInitialImageIndexes(List<ImageIndex> imageIndexes) {
-    for (ImageIndex imageIndex : imageIndexes) {
-        try {
-            String checkExistenceQuery = "SELECT COUNT(*) FROM images WHERE id = ?";
-            int count = jdbcTemplate.queryForObject(checkExistenceQuery, Integer.class, imageIndex.getId());
-
-            if (count > 0) {
-                
-                String updateQuery = "UPDATE images SET width = ?, height = ?, name = ?, format=?, histogram_2d = ?, histogram_3d = ? WHERE id = ?";
-                jdbcTemplate.update(updateQuery, 
-                    imageIndex.getWidth(),
-                    imageIndex.getHeight(),
-                    imageIndex.getName(),
-                    imageIndex.getFormat(),
-                    DBUtils.serialize2D(imageIndex.getHistogram2D()), 
-                    DBUtils.serialize3D(imageIndex.getHistogram3D()), 
-                    imageIndex.getId());
-            } else {
-                
-                String insertQuery = "INSERT INTO images (id, width, height, name, format, histogram_2d, histogram_3d) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                jdbcTemplate.update(insertQuery, 
-                    imageIndex.getId(), 
-                    imageIndex.getWidth(), 
-                    imageIndex.getHeight(), 
-                    imageIndex.getName(),
-                    imageIndex.getFormat(),
-                    DBUtils.serialize2D(imageIndex.getHistogram2D()), 
-                    DBUtils.serialize3D(imageIndex.getHistogram3D()));
-            }
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     try {
-        
-        String deleteUnusedIndexes = "DELETE FROM images WHERE id > ?";
-        jdbcTemplate.update(deleteUnusedIndexes, imageIndexes.get(imageIndexes.size() - 1).getId());
-    } catch (DataAccessException e) {
+        // Delete all existing data before inserting new records
+        String deleteAllQuery = "DELETE FROM images";
+        jdbcTemplate.update(deleteAllQuery);
+
+        for (ImageIndex imageIndex : imageIndexes) {
+            String insertQuery = "INSERT INTO images (id, width, height, name, format, histogram_2d, histogram_3d) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            jdbcTemplate.update(insertQuery, 
+                imageIndex.getId(), 
+                imageIndex.getWidth(), 
+                imageIndex.getHeight(), 
+                imageIndex.getName(),
+                imageIndex.getFormat(),
+                DBUtils.serialize2D(imageIndex.getHistogram2D()), 
+                DBUtils.serialize3D(imageIndex.getHistogram3D()));
+        }
+    } catch (DataAccessException | IOException e) {
         e.printStackTrace();
     }
 }
@@ -165,58 +142,67 @@ public List<ImageMetadata> getAllImagesMetaData() {
 }
 
 public List<ImageMetadata> getSortedImagesMetaIndexes(long id, int N, String descr) {
-        try {
-            String query = "SELECT id, width, height, name, format, histogram_2d, histogram_3d FROM images";
+    try {
+        String query = "SELECT id, width, height, name, format, histogram_2d, histogram_3d FROM images";
 
-            List<ImageIndex> imageList = jdbcTemplate.query(query, new RowMapper<ImageIndex>() {
-                @Override
-                public ImageIndex mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    long imageId = rs.getLong("id");
-                    int width = rs.getInt("width");
-                    int height = rs.getInt("height");
-                    String name = rs.getString("name");
-                    String format = rs.getString("format");
+        List<ImageIndex> imageList = jdbcTemplate.query(query, new RowMapper<ImageIndex>() {
+            @Override
+            public ImageIndex mapRow(ResultSet rs, int rowNum) throws SQLException {
+                long imageId = rs.getLong("id");
+                int width = rs.getInt("width");
+                int height = rs.getInt("height");
+                String name = rs.getString("name");
+                String format = rs.getString("format");
 
-                    byte[] hist2DBytes = descr.equals("histogram_2d") ? rs.getBytes("histogram_2d") : null;
-                    byte[] hist3DBytes = descr.equals("histogram_3d") ? rs.getBytes("histogram_3d") : null;
+                byte[] hist2DBytes = descr.equals("histogram_2d") ? rs.getBytes("histogram_2d") : null;
+                byte[] hist3DBytes = descr.equals("histogram_3d") ? rs.getBytes("histogram_3d") : null;
 
-                    int[][] hist2D = hist2DBytes != null ? DBUtils.deserialize2D(hist2DBytes, 256, 256) : null;
-                    int[][][] hist3D = hist3DBytes != null ? DBUtils.deserialize3D(hist3DBytes, 16, 16, 16) : null;
+                int[][] hist2D = null;
+                int[][][] hist3D = null;
 
-                    return new ImageIndex(name, width, height, format, hist2D, hist3D);
+                try {
+                    hist2D = hist2DBytes != null ? DBUtils.deserialize2D(hist2DBytes) : null;
+                    hist3D = hist3DBytes != null ? DBUtils.deserialize3D(hist3DBytes) : null;
+                } catch (IOException e) {
+                    System.err.println("Failed to deserialize histogram for image ID " + imageId + ": " + e.getMessage());
+                } catch (ClassNotFoundException e) {
+                    System.err.println("Failed to deserialize histogram for image ID " + imageId + ": " + e.getMessage());
                 }
-            });
 
-            ImageIndex targetImage = imageList.stream()
-                .filter(img -> img.getId() == id)
-                .findFirst()
-                .orElse(null);
-
-            if (targetImage == null) {
-                System.out.println("Image with ID " + id + " not found.");
-                return new ArrayList<>();
+                return new ImageIndex(imageId, name, width, height, format, hist2D, hist3D);
             }
+        });
 
-            List<ImageMetadata> sortedImages = imageList.stream()
-                .filter(img -> img.getId() != id) 
-                .sorted(Comparator.comparingDouble(img -> {
-                    if (descr.equals("histogram_2d")) {
-                        return ImageUtils.euclideanDistance2D(targetImage.getHistogram2D(), img.getHistogram2D());
-                    } else {
-                        return ImageUtils.euclideanDistance3D(targetImage.getHistogram3D(), img.getHistogram3D());
-                    }
-                }))
-                .limit(N) 
-                .map(img -> new ImageMetadata(img.getId(), img.getWidth(), img.getHeight(), img.getName(), img.getFormat())) // Remove histograms
-                .collect(Collectors.toList());
+        ImageIndex targetImage = imageList.stream()
+            .filter(img -> img.getId() == id)
+            .findFirst()
+            .orElse(null);
 
-            return sortedImages;
-
-        } catch (DataAccessException e) {
-            e.printStackTrace();
+        if (targetImage == null) {
+            System.out.println("Image with ID " + id + " not found.");
             return new ArrayList<>();
         }
+
+        List<ImageMetadata> sortedImages = imageList.stream()
+            .filter(img -> img.getId() != id)
+            .sorted(Comparator.comparingDouble(img -> {
+                if (descr.equals("histogram_2d")) {
+                    return ImageUtils.euclideanDistance2D(targetImage.getHistogram2D(), img.getHistogram2D());
+                } else {
+                    return ImageUtils.euclideanDistance3D(targetImage.getHistogram3D(), img.getHistogram3D());
+                }
+            }))
+            .limit(N)
+            .map(img -> new ImageMetadata(img.getId(), img.getWidth(), img.getHeight(), img.getName(), img.getFormat()))
+            .collect(Collectors.toList());
+
+        return sortedImages;
+
+    } catch (DataAccessException e) {
+        e.printStackTrace();
+        return new ArrayList<>();
     }
+}
 
 
 }
