@@ -15,6 +15,8 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
@@ -183,18 +185,22 @@ public List<ImageMetadata> getSortedImagesMetaIndexes(long id, int N, String des
             return new ArrayList<>();
         }
 
-        List<ImageMetadata> sortedImages = imageList.stream()
-            .filter(img -> img.getId() != id)
-            .sorted(Comparator.comparingDouble(img -> {
-                if (descr.equals("histogram_2d")) {
-                    return ImageUtils.euclideanDistance2D(targetImage.getHistogram2D(), img.getHistogram2D());
-                } else {
-                    return ImageUtils.euclideanDistance3D(targetImage.getHistogram3D(), img.getHistogram3D());
-                }
-            }))
-            .limit(N)
-            .map(img -> new ImageMetadata(img.getId(), img.getWidth(), img.getHeight(), img.getName(), img.getFormat()))
-            .collect(Collectors.toList());
+       List<ImageMetadata> sortedImages = imageList.stream()
+    .filter(img -> img.getId() != id)
+    .map(img -> {
+        double distance = descr.equals("histogram_2d") 
+            ? ImageUtils.euclideanDistance2D(targetImage.getHistogram2D(), img.getHistogram2D())
+            : ImageUtils.euclideanDistance3D(targetImage.getHistogram3D(), img.getHistogram3D());
+
+        ImageMetadata metadata = new ImageMetadata(img.getId(), img.getWidth(), img.getHeight(), img.getName(), img.getFormat());
+        metadata.setScore(1 / (1 + distance));
+        return new AbstractMap.SimpleEntry<>(distance, metadata);
+    })
+    .sorted(Comparator.comparingDouble(Map.Entry::getKey)) 
+    .limit(N)
+    .map(Map.Entry::getValue) 
+    .collect(Collectors.toList());
+
 
         return sortedImages;
 

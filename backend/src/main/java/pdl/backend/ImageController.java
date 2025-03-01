@@ -258,6 +258,7 @@ public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file,
             node.put("name", image.getName());
             node.put("type", image.getFormat());
             node.put("size", image.getWidth() + "x" + image.getHeight());
+            node.put("score", image.getScore());
             nodes.add(node);
         }
 
