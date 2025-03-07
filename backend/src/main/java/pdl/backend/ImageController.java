@@ -79,7 +79,6 @@ public class ImageController {
 
                 byte[] fileContent = Files.readAllBytes(resource.getFile().toPath());
 
-                Planar<GrayU8> image = ImageUtils.loadImage(fileContent);
                 BufferedImage bufferedImage = ImageIO.read(resource.getFile());
                 int width = bufferedImage.getWidth();
                 int height = bufferedImage.getHeight();
@@ -94,10 +93,7 @@ public class ImageController {
                  resourceFormat = reader.getFormatName();
                 }
 
-                int[][] histogram2D = ImageUtils.histogramHueSaturation(image);
-                int[][][] histogram3D = ImageUtils.histogramOfRGB(image);
-
-                ImageIndex imageIndex = new ImageIndex(filename, width, height, resourceFormat, histogram2D, histogram3D);
+                ImageIndex imageIndex = new ImageIndex(fileContent,filename, width, height, resourceFormat);
                 imageIndexesToUpload.add(imageIndex);
                 Image newImage = new Image(fileContent);
                 imageDao.create(newImage);
@@ -193,10 +189,8 @@ public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file,
         byte[] fileBytes = file.getBytes();
 
         Planar<GrayU8> image = ImageUtils.loadImage(fileBytes);
-        int[][] histogram2D = ImageUtils.histogramHueSaturation(image);
-        int[][][] histogram3D = ImageUtils.histogramOfRGB(image);
 
-        ImageIndex imageIndex = new ImageIndex(filename, image.getWidth(), image.getHeight(), contentType, histogram2D, histogram3D);
+        ImageIndex imageIndex = new ImageIndex(fileBytes, filename, image.getWidth(), image.getHeight(), contentType);
 
         imageRepository.addImageMetaData(imageIndex);
         Image newImage = new Image(fileBytes);
@@ -236,15 +230,15 @@ public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file,
     @RequestMapping(value = "/images/{id}/similar", method = RequestMethod.GET, produces = "application/json; charset=UTF-8")
     public ResponseEntity<ArrayNode> getImageListSortedBySimilarity(
             @PathVariable("id") long id,
-            @RequestParam(value = "number", defaultValue = "5") int number,
-            @RequestParam(value = "descriptor") String descriptor) {
+            @RequestParam(value = "descr") String descr,
+            @RequestParam(value = "number", defaultValue = "5") int number) {
 
-        if (!descriptor.equals("histogram_2d") && !descriptor.equals("histogram_3d")) {
+        if(descr == null || descr.isEmpty() || (!descr.equals("histogram_2d") && !descr.equals("histogram_3d") && !descr.equals("histogram_of_visual_words"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);
+                    .body(null); 
         }
 
-        List<ImageMetadata> images = imageRepository.getSortedImagesMetaIndexes(id, number, descriptor);
+        List<ImageMetadata> images = imageRepository.getSortedImagesMetaIndexes(id, number, descr);
 
         if (images.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

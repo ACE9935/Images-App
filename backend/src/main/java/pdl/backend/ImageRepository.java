@@ -25,27 +25,42 @@ public class ImageRepository {
   @Autowired
   private JdbcTemplate jdbcTemplate;
 
-public void setInitialImageIndexes(List<ImageIndex> imageIndexes) {
+  public void setInitialImageIndexes(List<ImageIndex> imageIndexes) {
     try {
-        // Delete all existing data before inserting new records
-        String deleteAllQuery = "DELETE FROM images";
-        jdbcTemplate.update(deleteAllQuery);
+        String createTableQuery = "CREATE TABLE IF NOT EXISTS images ("
+                + "id SERIAL PRIMARY KEY, "
+                + "width INT, "
+                + "height INT, "
+                + "name TEXT, "
+                + "format TEXT, "
+                + "histogram_of_visual_words BYTEA, "
+                + "histogram_2d BYTEA, "
+                + "histogram_3d BYTEA"
+                + ")";
+        jdbcTemplate.update(createTableQuery);
+
+        // Use TRUNCATE instead of DELETE to reset ID sequence
+        String truncateQuery = "TRUNCATE TABLE images RESTART IDENTITY";
+        jdbcTemplate.update(truncateQuery);
 
         for (ImageIndex imageIndex : imageIndexes) {
-            String insertQuery = "INSERT INTO images (id, width, height, name, format, histogram_2d, histogram_3d) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO images (width, height, name, format, histogram_of_visual_words, histogram_2d, histogram_3d) VALUES (?, ?, ?, ?, ?, ?, ?)";
             jdbcTemplate.update(insertQuery, 
-                imageIndex.getId(), 
                 imageIndex.getWidth(), 
                 imageIndex.getHeight(), 
                 imageIndex.getName(),
                 imageIndex.getFormat(),
-                DBUtils.serialize2D(imageIndex.getHistogram2D()), 
-                DBUtils.serialize3D(imageIndex.getHistogram3D()));
+                DBUtils.serialize1D(imageIndex.getHistogramOfVisualWords()),
+                DBUtils.serialize2D(imageIndex.getHistogram2D()),
+                DBUtils.serialize2D(imageIndex.getHistogram3D())
+            );
         }
     } catch (DataAccessException | IOException e) {
         e.printStackTrace();
     }
 }
+
+
 
 public ImageMetadata getImageMetaData(long id) {
 
@@ -81,15 +96,17 @@ public ImageMetadata getImageMetaData(long id) {
 public void addImageMetaData(ImageIndex imageIndex) {
 
         try {
-         String insertQuery = "INSERT INTO images (id, width, height, name, format, histogram_2d, histogram_3d) VALUES (?, ?, ?, ?, ?, ?, ?)";
+         String insertQuery = "INSERT INTO images (id, width, height, name, format, histogram_of_visual_words, histogram_2d, histogram_3d) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 jdbcTemplate.update(insertQuery, 
                     imageIndex.getId(), 
                     imageIndex.getWidth(), 
                     imageIndex.getHeight(), 
                     imageIndex.getName(),
                     imageIndex.getFormat(),
-                    DBUtils.serialize2D(imageIndex.getHistogram2D()), 
-                    DBUtils.serialize3D(imageIndex.getHistogram3D()));
+                    DBUtils.serialize1D(imageIndex.getHistogramOfVisualWords()),
+                    DBUtils.serialize2D(imageIndex.getHistogram2D()),
+                    DBUtils.serialize2D(imageIndex.getHistogram3D())
+            );
 
         } 
         catch (IOException e) {
@@ -144,8 +161,9 @@ public List<ImageMetadata> getAllImagesMetaData() {
 }
 
 public List<ImageMetadata> getSortedImagesMetaIndexes(long id, int N, String descr) {
+    
     try {
-        String query = "SELECT id, width, height, name, format, histogram_2d, histogram_3d FROM images";
+        String query = "SELECT id, width, height, name, format, " + descr + " FROM images";
 
         List<ImageIndex> imageList = jdbcTemplate.query(query, new RowMapper<ImageIndex>() {
             @Override
@@ -155,23 +173,17 @@ public List<ImageMetadata> getSortedImagesMetaIndexes(long id, int N, String des
                 int height = rs.getInt("height");
                 String name = rs.getString("name");
                 String format = rs.getString("format");
-
-                byte[] hist2DBytes = descr.equals("histogram_2d") ? rs.getBytes("histogram_2d") : null;
-                byte[] hist3DBytes = descr.equals("histogram_3d") ? rs.getBytes("histogram_3d") : null;
-
-                int[][] hist2D = null;
-                int[][][] hist3D = null;
+                byte[] histo = rs.getBytes(descr);
 
                 try {
-                    hist2D = hist2DBytes != null ? DBUtils.deserialize2D(hist2DBytes) : null;
-                    hist3D = hist3DBytes != null ? DBUtils.deserialize3D(hist3DBytes) : null;
-                } catch (IOException e) {
-                    System.err.println("Failed to deserialize histogram for image ID " + imageId + ": " + e.getMessage());
-                } catch (ClassNotFoundException e) {
-                    System.err.println("Failed to deserialize histogram for image ID " + imageId + ": " + e.getMessage());
+                    Object histogram = descr.equals("histogram_2d") ? DBUtils.deserialize2D(histo) :
+                                       descr.equals("histogram_3d") ? DBUtils.deserialize2D(histo) :
+                                       DBUtils.deserialize1D(histo);
+                    return new ImageIndex(imageId, name, width, height, format, descr, histogram);
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                    return null;
                 }
-
-                return new ImageIndex(imageId, name, width, height, format, hist2D, hist3D);
             }
         });
 
@@ -185,22 +197,28 @@ public List<ImageMetadata> getSortedImagesMetaIndexes(long id, int N, String des
             return new ArrayList<>();
         }
 
-       List<ImageMetadata> sortedImages = imageList.stream()
-    .filter(img -> img.getId() != id)
-    .map(img -> {
-        double distance = descr.equals("histogram_2d") 
-            ? ImageUtils.euclideanDistance2D(targetImage.getHistogram2D(), img.getHistogram2D())
-            : ImageUtils.euclideanDistance3D(targetImage.getHistogram3D(), img.getHistogram3D());
+        List<ImageMetadata> sortedImages = imageList.stream()
+            .filter(img -> img.getId() != id)
+            .map(img -> {
+                double distance = 0.0;
+                if (descr.equals("histogram_of_visual_words")) {
+                    distance = ImageUtils.euclideanDistance1D(targetImage.getHistogramOfVisualWords(), img.getHistogramOfVisualWords());
+                } else if (descr.equals("histogram_2d")) {
+                    distance = ImageUtils.euclideanDistance2D(targetImage.getHistogram2D(), img.getHistogram2D());
+                } else if (descr.equals("histogram_3d")) {
+                    distance = ImageUtils.euclideanDistance2D(targetImage.getHistogram3D(), img.getHistogram3D());
+                } else {
+                    throw new IllegalArgumentException("Unsupported histogram type: " + descr);
+                }
 
-        ImageMetadata metadata = new ImageMetadata(img.getId(), img.getWidth(), img.getHeight(), img.getName(), img.getFormat());
-        metadata.setScore(1 / (1 + distance));
-        return new AbstractMap.SimpleEntry<>(distance, metadata);
-    })
-    .sorted(Comparator.comparingDouble(Map.Entry::getKey)) 
-    .limit(N)
-    .map(Map.Entry::getValue) 
-    .collect(Collectors.toList());
-
+                ImageMetadata metadata = new ImageMetadata(img.getId(), img.getWidth(), img.getHeight(), img.getName(), img.getFormat());
+                metadata.setScore(1 / (1 + distance));
+                return new AbstractMap.SimpleEntry<>(distance, metadata);
+            })
+            .sorted(Comparator.comparingDouble(Map.Entry::getKey))
+            .limit(N) 
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toList());
 
         return sortedImages;
 
