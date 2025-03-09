@@ -33,6 +33,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,6 +50,7 @@ import pdl.backend.ImageMetadata;
 import pdl.backend.ImageDao;
 import pdl.backend.Image;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 public class ImageController {
 
@@ -117,8 +119,7 @@ public ResponseEntity<?> getImageMetaData(@PathVariable("id") long id) {
             node.put("id", imageMetaData.getId());
             node.put("name", imageMetaData.getName());
             node.put("format", imageMetaData.getFormat());
-            node.put("width", imageMetaData.getWidth());
-            node.put("height", imageMetaData.getHeight());
+            node.put("size", imageMetaData.getWidth() + "x" + imageMetaData.getHeight());
 
             return new ResponseEntity<>(node, HttpStatus.OK);
         } else {
@@ -196,12 +197,19 @@ public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file,
         Image newImage = new Image(fileBytes);
         imageDao.create(newImage);
 
+        ObjectNode node = mapper.createObjectNode();
+        node.put("id", imageIndex.getId());
+        node.put("name", imageIndex.getName());
+        node.put("format", imageIndex.getFormat());
+        node.put("size", imageIndex.getWidth() + "x" + imageIndex.getHeight());
+
+        return new ResponseEntity<>(node, HttpStatus.OK);
+
     } catch (IOException e) {
         e.printStackTrace();
         return new ResponseEntity<>("Failed to save image", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    return new ResponseEntity<>("Image added successfully", HttpStatus.CREATED);
 }
 
 

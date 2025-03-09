@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import ImagePreview from './components/ImagePreview.vue'
+import ImagesListLengthTab from './components/ImagesListLengthTab.vue';
 import ImagesSlider from './components/ImagesSlider.vue';
 import ImageUploader from './components/ImageUploader.vue';
-import ImageGallery from './components/ImageGallery.vue';
-import ImageDetails from './components/ImageDetails.vue';
 
 </script>
 
 <template>
-  <HelloWorld msg="Images App" />
-  <ImageUploader/>
+  <main class="max-w-[70rem] flex flex-col items-center gap-4 p-4">
+  <ImagePreview msg="Images App" />
+  <div class="flex sm:flex-row flex-col gap-3 sm:gap-6 w-full max-w-[50rem]">
+    <ImageUploader/>
+    <ImagesListLengthTab/>
+  </div>
   <ImagesSlider/>
-  <ImageGallery/>
-  <ImageDetails/>
+</main>
 </template>
 
 <style scoped>
