@@ -192,7 +192,7 @@ public class SimilarityComputing {
         return histogram;
     }
 
-    private static int findClosestCluster(TupleDesc_F64 feature, List<double[]> clusters) {
+    public static int findClosestCluster(TupleDesc_F64 feature, List<double[]> clusters) {
         int bestIndex = -1;
         double bestDistance = Double.MAX_VALUE;
     
