@@ -8,4 +8,5 @@ export interface ImageMetadata {
     name: string;
     size:string,
     format:string,
+    score?:number,
   }

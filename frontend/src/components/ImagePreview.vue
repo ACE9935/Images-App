@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from "vue";
 import ImageMetaDataTable from "./ImageMetaDataTable.vue";
 import { fetchImageById, fetchImages, deleteImageById } from "../http-api";
 import { useImageStore } from "../store/imageStore";
+import SimilarImages from "./SimilarImages.vue";
 
 const imgStore = useImageStore();
 const errorMessage = ref("");
@@ -95,7 +96,7 @@ watch(reloadTrigger, (newValue) => {
 
 <template>
   <div class="flex flex-col items-center gap-8">
-    <h1 class="text-beige text-center font-bold text-6xl">Image List</h1>
+    <h1 class="text-beige text-center font-bold text-6xl">Image Listo</h1>
     
     <select
       v-if="imgStore.imagesList.length > 0"
@@ -112,7 +113,7 @@ watch(reloadTrigger, (newValue) => {
     <p v-else class="flex gap-3 font-bold justify-center items-center bg-gray-300 border-2 border-gray-500 p-3 rounded-md text-black w-[20rem]"><i class="pi pi-image" style="font-size: 1rem"></i>No images found.</p>
     <p v-if="errorMessage" class="flex gap-3 font-bold items-center bg-red-300 border-2 border-red-500 p-3 rounded-md w-[20rem] justify-center"><i class="pi pi-exclamation-circle" style="font-size: 1rem"></i>{{ errorMessage }}</p>
     <div v-if="imgStore.imagesList.length > 0" class="rounded-sm shadow-md bg-white p-3 flex flex-col lg:flex-row gap-4">
-      <img id="img-preview" class="max-w-full md:max-w-[40rem] w-auto" src="" />
+      <img id="img-preview" class="max-w-full md:max-w-[40rem] w-auto h-full" src="" />
       <div class="flex flex-col gap-4">
       <ImageMetaDataTable :image="imgStore.selectedImageMetaData"/>
       <div class="flex gap-4">
@@ -133,6 +134,7 @@ watch(reloadTrigger, (newValue) => {
           Delete
         </button>
       </div>
+      <SimilarImages :image="imgStore.selectedImageMetaData"/>
       </div>
     </div>
   </div>
