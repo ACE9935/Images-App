@@ -17,4 +17,8 @@ public class Image {
   public byte[] getData() {
     return data;
   }
+
+  public static void resetCount() {
+    count = Long.valueOf(1);
+}
 }
