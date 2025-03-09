@@ -2,7 +2,6 @@
 
 import type { ImageMetadata } from '../types';
 defineProps<{ image: ImageMetadata }>();
-
 </script>
 
 <template>
