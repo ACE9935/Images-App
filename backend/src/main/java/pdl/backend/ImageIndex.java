@@ -10,7 +10,7 @@ public class ImageIndex extends ImageMetadata {
     private static Long count = Long.valueOf(1);
     private int[] histogram_of_visual_words;
     private int[][] histogram_2d;
-    private int[][][] histogram_3d;
+    private int[][] histogram_3d;
 
     public ImageIndex(byte[] imgData, final String name, final int width, final int height, final String format) {
 
