@@ -102,5 +102,4 @@ git clone git@gitlab.emi.u-bordeaux.fr:pdl-l3/teams/2025/l1/l1b.git
 
 ---
 
-Ce projet a été testé sur **Ubuntu 20.04** pour le serveur et sur **Firefox (version 98.0)** pour le client.
 
