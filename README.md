@@ -1,43 +1,106 @@
 # PDL - Recherche d'Images par Similarité
 
-## Introduction
+## Documentation d'Installation et de Test
 
-Ce projet est réalisé dans le cadre de la formation L3 Informatique à l'Université de Bordeaux. L'objectif est de développer une application de recherche d'images par similarité reposant sur une architecture client-serveur. Le serveur indexe et traite les images stockées dans un dossier spécifique, tandis que le client permet d'interagir via une interface web.
+### Systèmes d'Exploitation Testés
+- **Serveur** : Ubuntu 20.04
 
-## Exigences du Projet
+### Navigateurs Web Testés
+- **Client** : Firefox (version 128.7.0)
 
-### Noyau Commun (Backend)
-- **Langage et Outils** :
-  - Java (JDK 17)
-  - Maven
-  - Spring Boot 3.2.x
-- **Bibliothèques et Extensions** :
-  - BoofCV 1.1.2 pour le traitement d'images
-  - PostgreSQL 42.7.1 avec extension **pgvector** pour l'indexation dans la base de données
-  - Spring JDBC pour l'interfaçage avec la base de données
-- **Fonctionnalités** :
-  1. **Initialisation du Serveur** : Chargement et indexation des images présentes dans le dossier `images`.
-  2. **Gestion des Images** : Accès, ajout, suppression des images, et fourniture des métadonnées (ID, nom, taille, format).
-  3. **Indexation des Images** : Calcul des descripteurs (histogramme 2D Teinte/Saturation, histogramme 3D RGB et histogramme des visual words) et stockage dans la base.
-  4. **Recherche par Similarité** : Retour des N images les plus similaires à une image donnée, selon le descripteur spécifié.
+---
 
-### Communication (API REST)
-- **GET /images** : Récupération de la liste des images (format JSON).
-- **POST /images** : Ajout d'une image via une requête multipart.
-- **GET /images/{id}** : Récupération d'une image par son identifiant.
-- **DELETE /images/{id}** : Suppression d'une image.
-- **GET /images/{id}/similar?number=N&descriptor=DESCR** : Recherche d'images similaires.
+## Compilation et Exécution
 
-### Client
-- **Technologies** : TypeScript et Vue.js 3.x.
-- **Fonctionnalités** :
-  1. Visualiser les images disponibles sur le serveur sous forme de galerie ou carrousel.
-  2. Afficher les métadonnées et les images similaires lors de la sélection d'une image.
-  3. Enregistrer, ajouter et supprimer des images via l'interface.
-- **Compatibilité** :
-  - Serveur testé sur : Windows (≥ 10), Ubuntu (≥ 20.04), Debian Bookworm, ou MacOS (≥ 11).
-  - Client testé sur : Safari, Google Chrome, ou Firefox.
-- **Documentation** : Ce README décrit les étapes d'installation et d'exécution ainsi que la structure du projet.
+### Backend
 
-## Arborescence du Projet
+1. **Prérequis**  
+   - Java 17 ou supérieur
+   - Maven 3.6+
+   - PostgreSQL (configuration dans `application.properties`)
+
+2. **Clonage du Projet**  
+   Cloner le projet avec :
+   ```bash
+   git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
+   cd l1b/backend
+   ```
+
+3. **Configuration**  
+   S'assurer que le fichier `src/main/resources/application.properties` contient les bonnes informations de connexion à la base de données PostgreSQL.
+
+4. **Compilation et Lancement**  
+   ```bash
+   mvn clean install
+   mvn spring-boot:run
+   ```
+   Cela compile et démarre le serveur.
+
+5. **Exécution des Tests**  
+   Pour lancer les tests unitaires :
+   ```bash
+   mvn test
+   ```
+
+### Frontend
+
+1. **Prérequis**  
+   - Node.js 16+
+   - npm 8+
+
+2. **Installation des Dépendances**  
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+
+3. **Lancement du Client**  
+   ```bash
+   npm run dev
+   ```
+
+4. **Exécution des Tests**  
+   ```bash
+   npm run test
+   ```
+
+---
+
+## API REST - Points d'Entrée Principaux
+
+### Récupération de la Liste des Images
+- **Méthode** : `GET /images`
+- **Réponse** : JSON contenant les métadonnées des images indexées
+
+### Ajout d'une Image
+- **Méthode** : `POST /images`
+- **Données** : Image envoyée en `multipart/form-data`
+- **Réponse** : `201 Created` si l'ajout est réussi
+
+### Suppression d'une Image
+- **Méthode** : `DELETE /images/{id}`
+- **Réponse** : `204 No Content` si la suppression est réussie
+
+### Recherche d'Images Similaires
+- **Méthode** : `POST /search`
+- **Données** : Image de référence
+- **Réponse** : JSON contenant les images les plus similaires
+
+---
+
+## Clonage du Repository
+
+### Via HTTPS
+```bash
+git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
+```
+
+### Via SSH
+```bash
+git clone git@gitlab.emi.u-bordeaux.fr:pdl-l3/teams/2025/l1/l1b.git
+```
+
+---
+
+Ce projet a été testé sur **Ubuntu 20.04** pour le serveur et sur **Firefox (version 98.0)** pour le client.
 
