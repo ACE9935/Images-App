@@ -79,12 +79,27 @@
 
 ### Suppression d'une Image
 - **Méthode** : `DELETE /images/{id}`
-- **Réponse** : `204 No Content` si la suppression est réussie
+- **Réponse** : `200 OK` si la suppression est réussie
 
 ### Recherche d'Images Similaires
-- **Méthode** : `POST /search`
-- **Données** : Image de référence
-- **Réponse** : JSON contenant les images les plus similaires
+- **Méthode** : `GET /images/id/similar?number=N&descriptor=DESCR`
+- **Données** : Identifiant de l'image
+- **Réponse** : JSON contenant les images les plus similaires et  leurs scores de similarité
+
+
+#### Paramètres de requête
+
+Ce service accepte les paramètres suivants pour affiner la recherche :
+
+- **`number` (int, optionnel)** : Nombre d'images similaires à retourner (par défaut : `5`).  
+- **`descriptor` (string, requis)** : Type de descripteur utilisé pour la comparaison (`histogram_2d`, `histogram_3d`, `histogram_of_visual_words`).  
+
+#### Lorsqu'on utilise `histogram_of_visual_words`, la méthode repose sur un **modèle de sac de mots visuels (BoVW)** basé sur **k-means**. Voici les étapes principales :
+
+- **Extraction des caractéristiques locales** : Descripteurs importants sont extraits des images.
+- **Clustering avec k-means** : Ces descripteurs sont regroupés en `K` clusters représentant un vocabulaire visuel et stocké dans `/resources/visual_dictionary.dat`.
+- **Construction de l’histogramme** : Chaque image est représentée par un histogramme indiquant la fréquence des descripteurs dans chaque cluster.
+- **Comparaison des images** : La similarité entre images est calculée la distance euclidienne entre ces histogrammes.
 
 ---
 
