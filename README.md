@@ -103,18 +103,4 @@ Ce service accepte les paramètres suivants pour affiner la recherche :
 
 ---
 
-## Clonage du Repository
-
-### Via HTTPS
-```bash
-git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
-```
-
-### Via SSH
-```bash
-git clone git@gitlab.emi.u-bordeaux.fr:pdl-l3/teams/2025/l1/l1b.git
-```
-
----
-
 
