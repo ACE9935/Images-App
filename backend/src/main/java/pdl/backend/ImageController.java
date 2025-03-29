@@ -149,7 +149,41 @@ public ResponseEntity<?> getImageMetaData(@PathVariable("id") long id) {
 
   }
 
-    @RequestMapping(value = "/images/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/images/classify/{id}", method = RequestMethod.GET, produces = "application/json; charset=UTF-8")
+  @ResponseBody
+  public ResponseEntity<?> classifyImage(@PathVariable("id") long id) {
+
+   Optional<Image> optionalImage = imageDao.retrieve(id);
+
+    if (optionalImage.isPresent()) {
+        Image imgFile = optionalImage.get();
+        byte[] imageData = imgFile.getData();
+        try {
+            ModelPredictor classifier = new ModelPredictor();
+            String[] predictedClassAndItsProbability = classifier.classifyImage(imageData);
+            ImageMetadata imageMetaData = imageRepository.getImageMetaData(id);
+            
+            ObjectNode node = mapper.createObjectNode();
+            node.put("id", imageMetaData.getId());
+            node.put("name", imageMetaData.getName());
+            node.put("format", imageMetaData.getFormat());
+            node.put("size", imageMetaData.getWidth() + "x" + imageMetaData.getHeight());
+            node.put("class", predictedClassAndItsProbability[0]);
+            node.put("score", predictedClassAndItsProbability[1]);
+    
+            return new ResponseEntity<>(node, HttpStatus.OK);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Error during image classification", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    } else {
+        return new ResponseEntity<>("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+  }
+
+  @RequestMapping(value = "/images/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteImage(@PathVariable("id") long id) {
         
         try{

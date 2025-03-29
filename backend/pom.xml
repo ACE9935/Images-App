@@ -58,6 +58,11 @@
 			<artifactId>spring-dotenv</artifactId>
 			<version>4.0.0</version>
 		</dependency>
+		<dependency>
+  <groupId>org.tensorflow</groupId>
+  <artifactId>tensorflow-core-platform</artifactId>
+  <version>1.0.0</version>
+</dependency>
 	</dependencies>
 
 	<build>

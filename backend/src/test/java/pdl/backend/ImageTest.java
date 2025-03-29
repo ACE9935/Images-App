@@ -2,6 +2,7 @@ package pdl.backend;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import pdl.backend.Image;
 
 public class ImageTest {
 

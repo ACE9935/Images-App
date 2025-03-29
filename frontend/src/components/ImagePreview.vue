@@ -113,7 +113,7 @@ watch(reloadTrigger, (newValue) => {
 
 <template>
   <div class="flex flex-col items-center gap-8">
-    <h1 class="text-beige text-center font-bold text-6xl">Image List</h1>
+    <h1 class="text-beige text-center font-bold text-6xl">Image Listo</h1>
     
     <!-- Image Selector Dropdown -->
     <select
