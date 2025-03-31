@@ -20,10 +20,8 @@ public class ModelPredictor {
     
     private SavedModelBundle model;
     private List<String> classLabels;
-    private static final String modelPath = ModelPredictor.class.getClassLoader()
-            .getResource("new_cifar10_model").getPath();
-    private static final String labelsPath = ModelPredictor.class.getClassLoader()
-            .getResource("model_labels.txt").getPath();
+    private static final String modelPath = "target/classes/new_cifar10_model";
+    private static final String labelsPath = "target/classes/model_labels.txt";
 
     public ModelPredictor() throws IOException {
         model = SavedModelBundle.load(modelPath, "serve");
@@ -122,7 +120,7 @@ public class ModelPredictor {
 
     public static void main(String[] args) {
         try {
-            String imagePath = "l1b/backend/src/main/resources/images/deer.jpg";
+            String imagePath = "l1b/backend/src/main/resources/images/barda.jpg";
 
             if (!Files.exists(Path.of(modelPath))) {
                 throw new IOException("Model directory not found: " + Path.of(modelPath).toAbsolutePath());

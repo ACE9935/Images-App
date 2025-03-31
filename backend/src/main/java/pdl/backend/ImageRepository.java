@@ -4,15 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import java.io.IOException;
 import org.springframework.stereotype.Repository;
-import pdl.backend.DBUtils;
-import pdl.backend.ImageIndex;
-import pdl.backend.ImageMetadata;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.io.IOException;
 import java.util.List;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.springframework.jdbc.core.RowMapper;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.AbstractMap;

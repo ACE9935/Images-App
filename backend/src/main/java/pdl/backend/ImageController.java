@@ -1,25 +1,17 @@
 package pdl.backend;
 
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.Resource;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
+
 import java.nio.file.Files;
 import java.util.ArrayList;
-import boofcv.struct.image.GrayU8;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import java.io.File;
 import java.util.Iterator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +19,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.springframework.dao.DataAccessException;
-
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +34,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import boofcv.struct.image.Planar;
-import pdl.backend.ImageRepository;
-import pdl.backend.ImageUtils;
-import pdl.backend.ImageIndex;
-import pdl.backend.ImageMetadata;
-import pdl.backend.ImageDao;
-import pdl.backend.Image;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController

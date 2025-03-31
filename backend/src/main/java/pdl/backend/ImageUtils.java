@@ -7,40 +7,16 @@ import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.io.image.ConvertBufferedImage;
+
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import boofcv.io.image.ConvertBufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImageUtils {
-
-    public static int[] histogramOfHues(Planar<GrayU8> image) {
-        int width = image.width;
-        int height = image.height;
-
-        int[] histogram = new int[360];
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                int r = image.getBand(0).get(x, y);
-                int g = image.getBand(1).get(x, y);
-                int b = image.getBand(2).get(x, y);
-
-                float[] hsv = new float[3];
-                ColorHsv.rgbToHsv(r, g, b, hsv);
-                int pixelHue = (int) hsv[0];
-
-                histogram[pixelHue]++;
-            }
-        }
-        return histogram;
-    }
 
     public static Planar<GrayU8> loadImage(byte[] imageBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageBytes);
@@ -107,6 +83,18 @@ public class ImageUtils {
         return histogram;
     }
 
+    public static GrayU8 resizeImageNearest(GrayU8 input, int newWidth, int newHeight) {
+        GrayU8 resized = new GrayU8(newWidth, newHeight);
+        for (int y = 0; y < newHeight; y++) {
+            int srcY = y * input.height / newHeight;
+            for (int x = 0; x < newWidth; x++) {
+                int srcX = x * input.width / newWidth;
+                resized.set(x, y, input.get(srcX, srcY));
+            }
+        }
+        return resized;
+    }
+
     public static boolean compare2DHistograms(int[][] hist1, int[][] hist2) {
         for (int i = 0; i < hist1.length; i++) {
             for (int j = 0; j < hist1[i].length; j++) {
@@ -129,17 +117,6 @@ public class ImageUtils {
             }
         }
         return true;
-    }
-
-    public static void deleteImageFromImagesFolder(String filename) {
-        try {
-            Path imagePath = Paths.get("resources/images/" + filename); 
-            Files.deleteIfExists(imagePath);
-            System.out.println(filename+" deleted successfully from /images.");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error while deleting the image.");
-        }
     }
 
     public static double euclideanDistance2D(int[][] hist1, int[][] hist2) {
@@ -174,19 +151,26 @@ public class ImageUtils {
         return Math.sqrt(sum);
     }
 
-    public static List<TupleDesc_F64> extractFeatures(GrayU8 image) {
+    public static List<TupleDesc_F64> extractFeatures(GrayU8 grayImage) {
+
         List<TupleDesc_F64> descriptors = new ArrayList<>();
+    
+        // Configure Dense SURF with finer sampling
+        ConfigDenseSurfStable config = new ConfigDenseSurfStable();
+        config.descriptorScale = 0.5; // Adjust based on desired descriptor size
+        config.sampling.periodX = 2;  // Reduce to increase keypoint density
+        config.sampling.periodY = 2;  // Reduce to increase keypoint density
+        config.surf.widthLargeGrid = 4;
         
-        DescribeImageDense<GrayU8, TupleDesc_F64> denseExtractor =
-                FactoryDescribeImageDense.surfStable(new ConfigDenseSurfStable(), GrayU8.class);
-
-        denseExtractor.process(image);
-
-        for (int i = 0; i < denseExtractor.getDescriptions().size(); i++) {
-            descriptors.add(denseExtractor.getDescriptions().get(i));
-        }
-
+        // Extract dense SURF features from the grayscale image
+        DescribeImageDense<GrayU8, TupleDesc_F64> denseExtractor = 
+            FactoryDescribeImageDense.surfStable(config, GrayU8.class);
+        
+        denseExtractor.process(grayImage);
+        descriptors.addAll(denseExtractor.getDescriptions());
+    
         return descriptors;
     }
+    
 
 }

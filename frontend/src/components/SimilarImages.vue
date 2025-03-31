@@ -67,7 +67,7 @@ watch(selectedImage, (newImageId) => {
           <i v-if="isLoading" class="pi pi-spinner pi-spin" style="font-size: 1rem"></i>
           Get Similar Images
         </button>
-<div v-if="similarImages.length > 0" class="grid grid-cols-2 overflow-auto h-[30rem] gap-3" :class="{'opacity-[0.6]': isLoading, 'opacity-[1]': !isLoading}">
+<div v-if="similarImages.length > 0" class="grid grid-cols-2 overflow-auto max-h-[30rem] gap-3 py-3" :class="{'opacity-[0.6]': isLoading, 'opacity-[1]': !isLoading}">
   <div v-for="(image, index) in similarImages" @click="!isLoading ? imgStore.selectImage(String(image.id)) : null" :key="index" class="cursor-pointer">
     <img :src="'/images/visualize/' + image.id" class="w-full h-auto rounded-t-md"/>
     <div class="p-3 h-fit rounded-b-md bg-slate-100/45 shadow-md">

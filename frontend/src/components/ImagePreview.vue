@@ -4,6 +4,8 @@ import ImageMetaDataTable from "./ImageMetaDataTable.vue";
 import { fetchImageById, deleteImageById } from "../http-api";
 import { useImageStore } from "../store/imageStore";
 import SimilarImages from "./SimilarImages.vue";
+import ImageClassification from "./ImageClassification.vue";
+import AppAlert from "./utility/AppAlert.vue";
 
 const imgStore = useImageStore();
 
@@ -134,12 +136,9 @@ watch(reloadTrigger, (newValue) => {
     </select>
 
     <!-- No Images Found Message -->
-    <p 
-      v-else 
-      class="flex gap-3 font-bold justify-center items-center bg-gray-300 border-2 border-gray-500 p-3 rounded-md text-black w-[20rem]"
-    >
-      <i class="pi pi-image" style="font-size: 1rem"></i>No images found.
-    </p>
+    <AppAlert v-else icon="pi-image">
+      No images found. Please upload an image.
+    </AppAlert>
 
     <!-- Error Message -->
     <p 
@@ -185,6 +184,7 @@ watch(reloadTrigger, (newValue) => {
         </div>
 
         <SimilarImages v-if="imgStore.selectedImageMetaData" :image="imgStore.selectedImageMetaData" />
+        <ImageClassification  v-if="imgStore.selectedImageMetaData" :image="imgStore.selectedImageMetaData" />
       </div>
     </div>
   </div>

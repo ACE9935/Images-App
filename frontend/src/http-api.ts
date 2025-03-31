@@ -15,6 +15,11 @@ export const fetchSimilarImages = async (id: string, number: string, descr:strin
   return response.data;
 };
 
+export const fetchImageClassification = async (id: string) => {
+  const response = await apiClient.get(`/classify/${id}`);
+  return [response.data.class, response.data.score];
+};
+
 // Fetch a single image by ID
 export const fetchImageById = async (id: string) => {
     const response = await apiClient.get(`/visualize/${id}`, { responseType: "blob" });

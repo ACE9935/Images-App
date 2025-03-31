@@ -8,7 +8,6 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #faa9a9;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,12 +18,15 @@
 @theme {
   --color-navy: #001F3F;
   --color-beige: #F5F5DC;
+  --color-main: #5ebf88;
+  --color-main-dark: #35704f;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  background-color: var(--color-navy);
+}
+
+.bg-form{
+  background: linear-gradient(to right, var(--color-main) 20%, var(--color-main-dark));
 }
