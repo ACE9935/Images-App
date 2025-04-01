@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { doSignInWithEmailAndPassword, doSignInWithGoogle } from '../firebase/auth';
 import type { LoginResponse } from '../types/LoginResponse';
-import ErrorMessage from '../components/form/ErrorMessage.vue';
+import ErrorMessage from '../components/utility/ErrorMessage.vue';
 import BasicInput from '../components/form/BasicInput.vue';
 import ProviderLoginButton from '../components/form/ProviderLoginButton.vue';
-import BasicButton from '../components/form/BasicButton.vue';
-import Logo from '../components/Logo.vue';
+import BasicActionButton from '../components/form/BasicActionButton.vue';
+import AuthFomsNavigator from '../components/form/AuthFomsNavigator.vue';
+import ResetPasswordModal from '../components/form/ResetPasswordModal.vue';
+import { useToast } from "primevue/usetoast";
+import { auth } from '../firebase/firebase';
+import router from '../router';
+
+const toast = useToast();
 
 // Internal ref for the input value
 const email = ref("");
@@ -38,18 +44,28 @@ const onSubmit = async (e: Event) => {
     }
 }
 
+watch(
+  () => response.value,
+  (newResponse) => {
+    if (newResponse.status === "OK") {
+     toast.add({ severity: 'success', summary: 'Success', detail: `Nice to see you ${auth.currentUser?.displayName} !`, life: 3000 });
+     router.push('/');
+    }
+  }
+);
+
 </script>
 
 <template>
          <main className="min-h-screen bg-form text-black flex justify-center p-4">
            
-          <div className="bg-white p-8 flex flex-col gap-6 pt-12 rounded-md shadow-lg">
+          <div className="bg-white h-fit pb-12 p-8 flex flex-col gap-6 pt-12 rounded-md shadow-lg w-full max-w-[28rem]">
             
             <div className="flex flex-col gap-3">
             <h1 className="text-3xl font-bold text-primary-color">Log in to your account</h1>
-            <h2 className="font-bold">Don't have an account? Sign Up</h2>
+            <AuthFomsNavigator form="login" />
             </div>
-            <div className="flex flex-col w-[21rem] gap-5">
+            <div className="flex flex-col gap-5">
                 <ProviderLoginButton @click="onSubmitWithGoogle" url="/google.png">Google</ProviderLoginButton>
                 <div className="flex items-center gap-3"><div className="bg-slate-700 h-[0.09rem] w-full"></div>
                 <p className="min-w-max flex-grow">Or with email & password</p>
@@ -59,14 +75,16 @@ const onSubmit = async (e: Event) => {
                     <BasicInput
                     label="Email Address*"
                     type="email"
-                    id="email-login-input" value={email} :model-value="email"/>
+                    id="email-login-input" v-model="email"/>
                     <BasicInput
                     toggleVisibility
                     label="Password*"
                     type="password"
-                    id="password-login-input" value={password} :model-value="password"/>
-                    <div className="flex justify-end"></div>
-                    <BasicButton @click="onSubmit" :style="{ marginTop: '1rem' }" type="submit"> <i v-if="isLoading" class="pi pi-spinner pi-spin" style="font-size: 1rem"></i>Login</BasicButton>
+                    id="password-login-input" v-model="password"/>
+                    <div className="flex justify-end"><ResetPasswordModal/></div>
+
+                    <BasicActionButton :is-loading="isLoading" :on-click="onSubmit" :style="{ marginTop: '1rem' }" type="submit">Login</BasicActionButton>
+                    
                 </form>
             </div>
           </div>

@@ -7,8 +7,8 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div v-if="props.errorMessage" class="flex gap-3 font-semibold items-center bg-red-200 border-2 border-red-500 p-3 rounded-md w-full justify-center">
-    <i class="pi pi-exclamation-circle" style="font-size: 1rem"></i>
+  <div v-if="props.errorMessage" class="flex gap-3 font-semibold text-red-600 items-center bg-red-200 border-2 border-red-500 p-3 rounded-md w-full justify-center">
+    <i class="pi pi-exclamation-triangle" style="font-size: 1rem"></i>
     {{ props.errorMessage }}
   </div>
 </template>

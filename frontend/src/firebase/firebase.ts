@@ -5,14 +5,13 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAFVjPJh_AcP_YVfi5JbqvYqx9D422Sl3c",
-    authDomain: "recipes-app-d9a48.firebaseapp.com",
-    projectId: "recipes-app-d9a48",
-    storageBucket: "recipes-app-d9a48.firebasestorage.app",
-    messagingSenderId: "782441545728",
-    appId: "1:782441545728:web:a37251435387ca2632d8e5",
-    measurementId: "G-1Q1EMJX4SB"
-  };
+  apiKey: "AIzaSyCqBGiU6pklEiOL84qLIOu3dXrKg7dKJhE",
+  authDomain: "images-app-6bbe5.firebaseapp.com",
+  projectId: "images-app-6bbe5",
+  storageBucket: "images-app-6bbe5.firebasestorage.app",
+  messagingSenderId: "440600748418",
+  appId: "1:440600748418:web:34b49c1f042e07c7f1ef9b"
+};
 
 export const actionCodeSettings = {
   url: `${configurations.host}/?verified=true`, // URL where the link will redirect to after email verification
