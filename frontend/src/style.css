@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Delius&display=swap');
 @import "tailwindcss";
 @import 'primeicons/primeicons.css';
 
@@ -13,6 +14,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --swiper-navigation-size: 15px;
+  --swiper-navigation-color: black;
 }
 
 @theme {
@@ -29,4 +32,14 @@ body {
 
 .bg-form{
   background: linear-gradient(to right, var(--color-main) 20%, var(--color-main-dark));
+}
+
+.delius-regular {
+  font-family: "Delius", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.p-toast-message-icon{
+  margin-top: 4px !important;
 }

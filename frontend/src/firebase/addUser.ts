@@ -23,7 +23,7 @@ export async function addUser(user:User,provider:"Google"|"Email") {
         const querySnapshot = await getDocs(q);
         
         if (querySnapshot.empty) {
-            const docRef = await addDoc(collectionRef, user);
+            await addDoc(collectionRef, user);
             console.log("User added to the store");
             return user
         }else{

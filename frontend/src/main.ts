@@ -8,6 +8,7 @@ import Noir from './presets/Noir';
 import DialogService from 'primevue/dialogservice'
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice'
+import Tooltip from 'primevue/tooltip';
 import './style.css'
 
 const app = createApp(App);
@@ -29,4 +30,5 @@ app.use(PrimeVue, {
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
+app.directive('tooltip', Tooltip);
 app.mount('#app');

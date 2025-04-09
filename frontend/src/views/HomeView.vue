@@ -1,37 +1,45 @@
 <script setup lang="ts">
-import ImagePreview from '../components/ImagePreview.vue'
-import ImagesListLengthTab from '../components/ImagesListLengthTab.vue';
-import ImagesSlider from '../components/ImagesSlider.vue';
-import ImageUploader from '../components/ImageUploader.vue';
-import { useRoute } from 'vue-router'
-import { onMounted } from 'vue'
+import { ref } from 'vue';
+import ImagesClassesNavigator from '../components/home/ImagesClassesNavigator.vue';
+import { useRoute } from 'vue-router';
+import { onMounted } from 'vue';
 import { useToast } from "primevue/usetoast";
+import AppNavBar from '../components/AppNavBar.vue';
+import CIFAR10_CLASSES from '../utils/ImagesClasses';
+import type { CIFAR10Classes } from '../types/cifar10';
+import ImagesTab from '../components/home/ImagesTab.vue';
 
-const route = useRoute()
+const route = useRoute();
+
+// Define a ref to store the selected class
+const selectedClass = ref<CIFAR10Classes>(CIFAR10_CLASSES[0]);
 
 onMounted(() => {
   const isVerifiedUser = route.query['verified-user'];
 
-  if(isVerifiedUser) {
+  if (isVerifiedUser) {
     const toast = useToast();
     toast.add({ severity: 'success', summary: 'Success', detail: 'Your email has been verified !', life: 3000 });
   }
-  
-})
+});
 
+const updateSelectedClass = (newClass: CIFAR10Classes) => {
+  selectedClass.value = newClass;
+};
 </script>
 
 <template>
-  <main class="max-w-[70rem] flex flex-col items-center gap-4 p-4">
-  <ImagePreview msg="Images App" />
-  <div class="flex sm:flex-row flex-col gap-3 sm:gap-6 w-full max-w-[50rem]">
-    <ImageUploader/>
-    <ImagesListLengthTab/>
+  <div class="p-4">
+    <AppNavBar />
   </div>
-  <ImagesSlider/>
-</main>
+  <main class="flex flex-col items-center gap-4 p-4">
+    <div class="text-black flex flex-col items-center gap-6 py-10 w-full max-w-[45rem] text-center">
+      <h1 class="text-5xl delius-regular font-bold leading-16">Discover captivating images in one place</h1>
+      <p class="text-gray-800 text-xl">Explore images of 10 different classes and have them saved!</p>
+    </div>
+    
+    <ImagesClassesNavigator :selectedClass="selectedClass" @update-selected-class="updateSelectedClass" />>
+    <ImagesTab :imgClass="selectedClass" />
+    
+  </main>
 </template>
-
-<style scoped>
-
-</style>

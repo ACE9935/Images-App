@@ -1,8 +1,11 @@
+import type { Album } from "./Album"
+
 export interface User {
     id:string
-    favImages:[],
-    albums:[],
-    uploadedImages:[],
+    favImages:string[],
+    albums:Album[],
+    viewedImages:{imgId:string,date:Date}[],
+    uploadedImages:string[],
     verificationToken?:string,
     resetPasswordToken?:string,
     photoUrl?:string

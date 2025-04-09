@@ -4,7 +4,6 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   updateProfile,
-  signInWithEmailLink,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
@@ -134,9 +133,9 @@ export const doCreateUserWithEmailAndPassword = async ({userName,email, pwd,rePw
 
     // Update user profile with name
     if (auth.currentUser) {
-      const data:User={userName,email,acceptPlcs,id:auth.currentUser.uid,emailVerified:false,photoUrl:configurations.userDefaultPic,favImages:[],albums:[],uploadedImages:[], joinDate:(new Date())}
+      const data:User={userName,email,acceptPlcs,id:auth.currentUser.uid,emailVerified:false,photoUrl:configurations.userDefaultPic,favImages:[],albums:[],uploadedImages:[], joinDate:(new Date()), viewedImages:[]}
       await updateProfile(auth?.currentUser, { displayName: userName,photoURL:data.photoUrl })
-            .then(async user=>{
+            .then(async ()=>{
               const newUser=await addUser(data,"Email")
               const accessToken=await auth?.currentUser?.getIdToken()
               if(auth.currentUser) await AuthServices.sendVerificationEmail(
@@ -173,7 +172,7 @@ export const doSignInWithGoogle = async ():Promise<SignUpResponse> => {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const data:User={userName: user.displayName!, email: user.email!, emailVerified: user.emailVerified, id: user.uid, photoUrl: user.photoURL!,acceptPlcs:false, favImages:[],albums:[],uploadedImages:[],joinDate:(new Date())}
+    const data:User={userName: user.displayName!, email: user.email!, emailVerified: user.emailVerified, id: user.uid, photoUrl: user.photoURL!,acceptPlcs:false, favImages:[],albums:[],uploadedImages:[],joinDate:(new Date()), viewedImages:[]}
     await addUser(data, "Google")
     return { errors: null, status: "OK", method: "google" };  
   }catch(e){
@@ -195,7 +194,7 @@ export const resetPassword = async (email:string): Promise<PwdResetResponse> => 
     const user = await getUserByEmail(email);
     if (!user) return { errorMsg: 'User not found. Please check your email', status: "ERROR" };
 
-    const response = await AuthServices.sendPasswordResetLink(email);
+    await AuthServices.sendPasswordResetLink(email);
 
     // Return success status if everything is successful
     return { errorMsg: null, status: "OK" };

@@ -1,81 +1,116 @@
 <script setup lang="ts">
+import { onMounted, ref, watch } from 'vue';
+import type { ImageMetaData } from '../types/ImageMetaData';
+import { fetchImages, fetchSimilarImages } from '../http-api';
+import Popover from 'primevue/popover';
+import BasicActionButton from './form/BasicActionButton.vue';
+import ImagesContainer from './ImagesContainer.vue';
+import LoaderLogo from './utility/LoaderLogo.vue';
 
-import { computed, ref, watch } from 'vue';
-import type { ImageMetadata } from '../types';
-import { fetchSimilarImages } from '../http-api';
-import { useImageStore } from '../store/imageStore';
-const props=defineProps<{ image: ImageMetadata }>();
+const props = defineProps<{ image: ImageMetaData | null }>();
+const op = ref();
 
-const imgStore = useImageStore();
-const selectedImage = computed(() => imgStore.selectedImage);
-
-const similarImages = ref<ImageMetadata[]>([]);
-const numOfSimilarImages = ref<string>("5");
-const descrOfSimilarImages = ref<"histogram_2d"|"histogram_3d"|"histogram_of_visual_words">("histogram_2d");
+const similarImages = ref<ImageMetaData[]>([]);
+const numOfSimilarImages = ref(10);
+const numOfImages=ref(0)
+const descrOfSimilarImages = ref<"histogram_2d" | "histogram_3d" | "histogram_of_visual_words">("histogram_of_visual_words");
 const errorMessage = ref("");
 const isLoading = ref(false);
 
+const showMoreImages = () => {
+  numOfSimilarImages.value += 10;
+  getSimilarImages();
+};
+
+const toggle = (event:Event) => {
+    op.value.toggle(event);
+}
+
 const getSimilarImages = async () => {
   try {
+    if (!props.image) {
+      console.error("Image not found");
+      return;
+    }
     errorMessage.value = "";
-    isLoading.value = true; // Set deleting state to true
-    const similarImagesResponse = await fetchSimilarImages(String(props.image.id), numOfSimilarImages.value, descrOfSimilarImages.value);
+    isLoading.value = true;
+    const similarImagesResponse = await fetchSimilarImages(
+      String(props.image.id),
+      String(numOfSimilarImages.value),
+      descrOfSimilarImages.value
+    );
     similarImages.value = similarImagesResponse;
-
   } catch (error) {
-    console.error("Failed to images:", error);
+    console.error("Failed to load images:", error);
     errorMessage.value = "Failed to load similar images.";
-  }
-  finally {
-    isLoading.value = false; // Set deleting state to false when done
+  } finally {
+    isLoading.value = false;
   }
 };
 
-watch(selectedImage, (newImageId) => {
-  if (newImageId) {
-    similarImages.value = [];
-  }
-}, { immediate: true });
+onMounted(async ()=>{
+  const data=await fetchImages();
+  numOfImages.value=data.length
+})
+
+watch(
+  () => props.image,
+  (newImage) => {
+    if (newImage) {
+      numOfSimilarImages.value = 10;
+      getSimilarImages();
+    }
+  },
+  { immediate: true }
+);
 
 </script>
 
 <template>
-  <div class="text-black flex flex-col gap-3 max-w-[22rem]">
-    <h2 class="font-bold text-2xl">Similar Images:</h2>
-    <p v-if="errorMessage" class="flex gap-3 font-bold items-center bg-red-300 border-2 border-red-500 p-3 rounded-md w-full justify-center"><i class="pi pi-exclamation-circle" style="font-size: 1rem"></i>{{ errorMessage }}</p>
-    <div class="flex gap-3 items-center justify-between">
-    <div class="flex gap-2 font-semibold flex-col">
-    <label for="#descr-selector">Choose descriptor </label>
-    <select id="descr-selector" v-model="descrOfSimilarImages" class="text-black w-min bg-white p-2 rounded-md shadow-md cursor-pointer hover:outline-green-400 outline-2 border-none">
-        <option value="histogram_2d">HSV</option>
-        <option value="histogram_3d">RGB</option>
-        <option value="histogram_of_visual_words">Bag of words</option>
-    </select>
-</div>
-<div class="flex gap-2 font-semibold flex-col">
-    <label class="w-max">Number of images</label>
-    <input type="number" v-model="numOfSimilarImages" class="text-black max-w-[10rem] bg-white p-2 rounded-md shadow-md cursor-pointer hover:outline-green-400 outline-2 border-none"/>
-</div>
-</div>
-<button 
-          @click="getSimilarImages" 
-          :disabled="isLoading"
-          class="rounded-md grow justify-center font-bold text-white p-3 flex gap-2 items-center transition-all"
-          :class="{'bg-gray-400 cursor-wait': isLoading, 'bg-amber-500 hover:bg-amber-700 cursor-pointer': !isLoading}"
-        >
-          <i v-if="!isLoading" class="pi pi-cog" style="font-size: 1rem"></i>
-          <i v-if="isLoading" class="pi pi-spinner pi-spin" style="font-size: 1rem"></i>
-          Get Similar Images
-        </button>
-<div v-if="similarImages.length > 0" class="grid grid-cols-2 overflow-auto max-h-[30rem] gap-3 py-3" :class="{'opacity-[0.6]': isLoading, 'opacity-[1]': !isLoading}">
-  <div v-for="(image, index) in similarImages" @click="!isLoading ? imgStore.selectImage(String(image.id)) : null" :key="index" class="cursor-pointer">
-    <img :src="'/images/visualize/' + image.id" class="w-full h-auto rounded-t-md"/>
-    <div class="p-3 h-fit rounded-b-md bg-slate-100/45 shadow-md">
-      <p class="font-bold hover:underline">{{ image.name }}</p>
-      <p>Size: {{ image.size }}</p>
-      <p class="truncate">Score: {{ image.score }}</p>
+  <div class="text-black flex flex-col gap-3 w-full max-w-[70rem]">
+    <div class="flex justify-between">
+      <h2 class="font-bold text-3xl delius-regular">Most Similar Images:</h2>
+      <div class="relative">
+
+        <BasicActionButton class="py-3 md:py-2" icon="pi-filter" variant="gray" :is-loading="isLoading" :on-click="toggle">
+          <div class="hidden md:block">Similarity Descriptor</div>
+        </BasicActionButton>
+
+        <Popover ref="op">
+          <ul class="w-48 rounded-md">
+            <li 
+              v-for="option in [
+                { value: 'histogram_2d', label: 'HSV' },
+                { value: 'histogram_3d', label: 'RGB' },
+                { value: 'histogram_of_visual_words', label: 'Visual words' }
+              ]" 
+              :key="option.value" 
+              class="p-2 cursor-pointer hover:bg-gray-200"
+              @click="descrOfSimilarImages = option.value as 'histogram_2d' | 'histogram_3d' | 'histogram_of_visual_words'; op.hide();numOfSimilarImages=10; getSimilarImages();"
+            >
+              {{ option.label }}
+            </li>
+          </ul>
+        </Popover>
+      </div>
     </div>
-  </div>
+    
+    <LoaderLogo v-if="similarImages.length==0"/>
+    <div v-else>
+     <ImagesContainer :class="{'opacity-50 pointer-events-none': isLoading}" class="transition-opacity duration-300" :images="similarImages"/>
+     <div v-if="similarImages.length != (numOfImages-1)" class="flex justify-center mt-4">
+  <BasicActionButton icon="pi-plus" :is-loading="isLoading" :on-click="showMoreImages">
+    Show More
+  </BasicActionButton>
 </div>
+  </div>
   </div>
 </template>
+
+<style scoped>
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+</style>

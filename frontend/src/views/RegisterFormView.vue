@@ -12,7 +12,6 @@ import AppAlert from '../components/utility/AppAlert.vue';
 import ErrorMessage from '../components/utility/ErrorMessage.vue';
 import type { RawUser } from '../types/RawUser';
 import type { SignUpResponse } from '../types/SignUpResponse';
-import type { SignUpErrors } from '../types/SignUpErrors';
 import BasicButton from '../components/form/BasicButton.vue';
 import router from '../router';
 
@@ -27,7 +26,7 @@ const initialUser = ref<RawUser>({
 const visibleDialog = ref(false);
 const isLoading = ref(false);
 const response = ref<SignUpResponse>({ errors: null, status: null });
-const errors = ref<SignUpErrors | null>(response.value.errors);
+const errors = ref<any>(response.value.errors);
 
 const onSubmit = async (e: Event) => {
   e.preventDefault();
@@ -74,13 +73,13 @@ watch(
     </Dialog>
     <div class="bg-white h-fit pb-12 p-8 flex flex-col gap-6 pt-12 rounded-md shadow-lg w-full max-w-[28rem]">
       <div class="flex flex-col gap-3">
-        <h1 class="text-3xl font-bold text-primary-color">Log in to your account</h1>
+        <h1 class="text-3xl font-bold text-primary-color text-center">Register an account</h1>
         <AuthFomsNavigator form="register" />
       </div>
       <div class="flex flex-col gap-5">
         <ProviderLoginButton
           @click="handleGoogleSignIn"
-          :url="'/google.png'"
+          :url="'/imgs/google.png'"
         >
           Sign up with Google
         </ProviderLoginButton>

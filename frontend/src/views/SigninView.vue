@@ -62,11 +62,11 @@ watch(
           <div className="bg-white h-fit pb-12 p-8 flex flex-col gap-6 pt-12 rounded-md shadow-lg w-full max-w-[28rem]">
             
             <div className="flex flex-col gap-3">
-            <h1 className="text-3xl font-bold text-primary-color">Log in to your account</h1>
+            <h1 className="text-3xl font-bold text-primary-color text-center">Log in to your account</h1>
             <AuthFomsNavigator form="login" />
             </div>
             <div className="flex flex-col gap-5">
-                <ProviderLoginButton @click="onSubmitWithGoogle" url="/google.png">Google</ProviderLoginButton>
+                <ProviderLoginButton @click="onSubmitWithGoogle" url="/imgs/google.png">Google</ProviderLoginButton>
                 <div className="flex items-center gap-3"><div className="bg-slate-700 h-[0.09rem] w-full"></div>
                 <p className="min-w-max flex-grow">Or with email & password</p>
                 <div className="bg-slate-700 h-[0.09rem] w-full"></div></div>
