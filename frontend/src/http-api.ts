@@ -4,7 +4,7 @@ import type { CIFAR10Classes } from "./types/cifar10";
 import type { ImageMetaData } from "./types/ImageMetaData";
 
 const apiClient = axios.create({
-    baseURL: "/images",
+    baseURL: "https://images-app-production.up.railway.app/images",
 });
 
 // Fetch the list of images

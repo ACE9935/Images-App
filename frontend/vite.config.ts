@@ -18,13 +18,6 @@ export default defineConfig({
     assetsDir: 'static'
   },
   server: {
-    proxy: {
-      '^/images': {
-        target: 'https://images-app-production.up.railway.app',
-        changeOrigin:true,
-        secure: false,
-      },
-      },
       watch: {
         usePolling: true, // Forces Vite to check file changes actively
         interval: 100, // Adjust the polling interval (default is 100ms)
