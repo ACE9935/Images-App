@@ -20,7 +20,7 @@ export default defineConfig({
   server: {
     proxy: {
       '^/images': {
-        target: 'https://images-app-backend.vercel.app', // Spring boot backend address
+        target: 'https://images-app-production.up.railway.app', // Spring boot backend address
       },
       },
       watch: {
