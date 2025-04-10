@@ -21,7 +21,8 @@ export default defineConfig({
     proxy: {
       '^/images': {
         target: 'https://images-app-production.up.railway.app',
-        changeOrigin:true
+        changeOrigin:true,
+        secure: false,
       },
       },
       watch: {
