@@ -142,7 +142,7 @@ watch(
             id="repassword-register-input"
             v-model="initialUser.rePwd"
           />
-        <div><span v-if="errors?.error.acceptPlcs" className="text-red-500 text-sm">{{errors?.error.acceptPlcs}}</span>
+        <div><span v-if="errors?.error.acceptPlcs" class="text-red-500 text-sm">{{errors?.error.acceptPlcs}}</span>
           <div class="flex gap-2">
             <input
               type="checkbox"
