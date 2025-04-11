@@ -350,5 +350,4 @@ public ResponseEntity<?> updateImageTitle(@PathVariable("id") long id,
     }
 }
 
-
 }
