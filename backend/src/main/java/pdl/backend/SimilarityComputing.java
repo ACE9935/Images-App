@@ -28,9 +28,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -183,8 +183,7 @@ public class SimilarityComputing {
         }
     
         return planarImage;
-    }
-    
+    }    
     
     private static List<TupleDesc_F64> extractDescriptorsFromImages(List<Planar<GrayU8>> images) {
         List<TupleDesc_F64> descriptors = new ArrayList<>();
@@ -254,9 +253,10 @@ public class SimilarityComputing {
     public static List<double[]> loadClustersFromFile(String filePath) {
         List<double[]> clusters = new ArrayList<>();
 
+        // Try loading the resource as a classpath resource
         Resource resource = new ClassPathResource(filePath);
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(resource.getFile()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 // Split the line by commas to get individual cluster values
