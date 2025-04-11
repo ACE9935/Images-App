@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+@CrossOrigin(origins = "https://images-app-production.up.railway.app")
 @RestController
 public class ImageController {
 
