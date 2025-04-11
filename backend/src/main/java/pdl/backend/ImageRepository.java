@@ -5,12 +5,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.io.IOException;
 import java.util.List;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -92,47 +94,48 @@ public ImageMetadata getImageMetaData(long id) {
     }
 }
 
-public long addImageMetaData(ImageIndex imageIndex) {
-    try {
+    @Transactional
+    public long addImageMetaData(ImageIndex imageIndex) {
         String insertQuery = "INSERT INTO images (width, height, name, format, histogram_of_visual_words, histogram_2d, histogram_3d, img_class, img_class_confidence, img_url, author, title) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        // Prepare the KeyHolder to capture the auto-generated key
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(connection -> {
-            // Create the prepared statement with the insert query
-            var preparedStatement = connection.prepareStatement(insertQuery, new String[]{"id"}); // "id" is the auto-generated key
-            preparedStatement.setInt(1, imageIndex.getWidth());
-            preparedStatement.setInt(2, imageIndex.getHeight());
-            preparedStatement.setString(3, imageIndex.getName());
-            preparedStatement.setString(4, imageIndex.getFormat());
-            
-            // Wrap the serialization methods that might throw IOException inside try-catch
-            try {
-                preparedStatement.setBytes(5, DBUtils.serialize1D(imageIndex.getHistogramOfVisualWords()));
-                preparedStatement.setBytes(6, DBUtils.serialize2D(imageIndex.getHistogram2D()));
-                preparedStatement.setBytes(7, DBUtils.serialize2D(imageIndex.getHistogram3D()));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null; 
-            }
+        try {
+            byte[] histogram1D = DBUtils.serialize1D(imageIndex.getHistogramOfVisualWords());
+            byte[] histogram2D = DBUtils.serialize2D(imageIndex.getHistogram2D());
+            byte[] histogram3D = DBUtils.serialize2D(imageIndex.getHistogram3D());
 
-            preparedStatement.setString(8, imageIndex.getImgClass());
-            preparedStatement.setDouble(9, imageIndex.getImgClassConfidence());
-            preparedStatement.setString(10, imageIndex.getImgUrl());
-            preparedStatement.setString(11, imageIndex.getAuthor());
-            preparedStatement.setString(12, imageIndex.getTitle());
-            return preparedStatement;
-        }, keyHolder); 
+            jdbcTemplate.update(connection -> {
+                PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, new String[]{"id"});
 
-        // Return the generated ID from the KeyHolder
-        return keyHolder.getKey().longValue();
+                preparedStatement.setInt(1, imageIndex.getWidth());
+                preparedStatement.setInt(2, imageIndex.getHeight());
+                preparedStatement.setString(3, imageIndex.getName());
+                preparedStatement.setString(4, imageIndex.getFormat());
+                preparedStatement.setBytes(5, histogram1D);
+                preparedStatement.setBytes(6, histogram2D);
+                preparedStatement.setBytes(7, histogram3D);
+                preparedStatement.setString(8, imageIndex.getImgClass());
+                preparedStatement.setDouble(9, imageIndex.getImgClassConfidence());
+                preparedStatement.setString(10, imageIndex.getImgUrl());
+                preparedStatement.setString(11, imageIndex.getAuthor());
+                preparedStatement.setString(12, imageIndex.getTitle());
 
-    } catch (DataAccessException e) {
-        e.printStackTrace();
-        return -1;
+                return preparedStatement;
+            }, keyHolder);
+
+            return keyHolder.getKey().longValue();
+
+        } catch (IOException e) {
+            System.err.println("Error serializing histogram data: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        } catch (Exception e) {
+            System.err.println("Database error when inserting image metadata: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
     }
-}
 
 
 public void deleteImageIndex(long id) {
