@@ -37,10 +37,14 @@ import BasicActionButton from './BasicActionButton.vue';
 import BasicInput from './BasicInput.vue';
 import { updateUsername } from '../../firebase/updateUserName';
 
+const props = defineProps<{
+    userName:string;
+}>();
+
 const userContext = inject<UserContext>('userContext');
 const visibleDialog = ref(false);
 const isLoading = ref(false);
-const newName = ref<string>("");
+const newName = ref<string>(props.userName);
 
 const user = computed(() => userContext?.user.value);
 const refetchUser = userContext?.refreshUser;

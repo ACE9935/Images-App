@@ -27,7 +27,7 @@ defineProps({
       </div>
       <div class="flex flex-col gap-2 w-full">
         <UpdateProfileImageButton />
-        <UpdateProfileName />
+        <UpdateProfileName :user-name="user.userName"/>
       </div>
       <div class="w-full border-b-2 border-gray-200 pb-2">
         <div class="text-gray-700 flex justify-between">

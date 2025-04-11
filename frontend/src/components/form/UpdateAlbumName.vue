@@ -35,12 +35,13 @@
     
     const props = defineProps<{
         albumId:number;
+        albumName:string;
     }>();
 
     const userContext = inject<UserContext>('userContext');
     const visibleDialog = ref(false);
     const isLoading = ref(false);
-    const newName = ref<string>("");
+    const newName = ref<string>(props.albumName);
     
     const user = computed(() => userContext?.user.value);
     const refetchUser = userContext?.refreshUser;

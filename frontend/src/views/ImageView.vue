@@ -101,7 +101,7 @@ watch(user, async (newUser) => {
          </div>
         </div>
 
-            <h1 class="text-4xl text-black font-bold flex items-center gap-2">{{ imgData.title}}<UpdateImageName :refetch-image="()=>fetchData(String(imgData?.id))" :img-id="String(imgData?.id)"/></h1>
+            <h1 class="text-4xl text-black font-bold flex items-center gap-2">{{ imgData.title}}<UpdateImageName :img-name="imgData.title" :refetch-image="()=>fetchData(String(imgData?.id))" :img-id="String(imgData?.id)"/></h1>
             <div class="flex items-center gap-3 mt-1">
         <div class="flex items-center gap-1"><i class="pi pi-heart-fill text-gray-500 mt-1" style="font-size: 1rem"></i><span class="text-black">{{ imgData.likeCount }}</span></div>
         <div class="flex items-center gap-1"><i class="pi pi-download text-gray-500 mt-1" style="font-size: 1rem"></i><span class="text-black">{{ imgData.downloadCount }}</span></div>

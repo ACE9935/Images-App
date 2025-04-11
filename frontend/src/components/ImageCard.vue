@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ImageMetaData } from '../types/ImageMetaData';
-import { onMounted, ref, computed, inject } from 'vue';
+import { ref, computed, inject, watch } from 'vue';
 import type { User } from '../types/UserInterface';
 import { getUserById } from '../firebase/getUserById';
 import { formatUploadDate } from '../utils/formatUploadDate';
@@ -28,17 +28,23 @@ const isAuthor = computed(() =>
   user.value?.uploadedImages?.map(Number).includes(Number(props.imgData.id)) ?? false
 );
 
-onMounted(async () => {
-  try {
-    isLoading.value = true;
-    imgAuthor.value = await getUserById(props.imgData.author);
-  } catch (error) {
-    console.error('Error fetching Author:', error);
-    imgAuthor.value = null;
-  } finally {
-    isLoading.value = false;
-  }
-});
+watch(
+  () => props.imgData,
+  async (newImage) => {
+    if (newImage) {
+      try {
+       isLoading.value = true;
+       imgAuthor.value = await getUserById(props.imgData.author);
+      } catch (error) {
+       console.error('Error fetching Author:', error);
+       imgAuthor.value = null;
+      } finally {
+       isLoading.value = false;
+      }
+    }
+  },
+  { immediate: true }
+);
 
 const navigateToImagePage=(e:Event)=> {
   e.stopPropagation()

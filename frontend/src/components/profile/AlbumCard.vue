@@ -34,7 +34,7 @@
       <div>
         <h2 class="text-xl text-black font-semibold flex gap-2">
           {{ props.album.name }}
-          <UpdateAlbumName :album-id="props.album.id" />
+          <UpdateAlbumName :album-id="props.album.id" :album-name="props.album.name" />
         </h2>
         <div class="text-gray-700 text-sm">
           Created at: {{ parseFirebaseDateValue(props.album.date, true) }}

@@ -7,6 +7,7 @@
       
           <form @submit="handleSubmit" class="flex flex-col gap-3">
             <BasicInput
+            
             maxLength="24"
             :style="{ width: '20rem' }"
             placeholder="Enter a title..."
@@ -34,6 +35,7 @@
     import { updateImageTitle } from '../../http-api';
     
     const props = defineProps<{
+        imgName:string;
         imgId:string;
         refetchImage: () => Promise<void>;
     }>();
@@ -41,7 +43,7 @@
     const userContext = inject<UserContext>('userContext');
     const visibleDialog = ref(false);
     const isLoading = ref(false);
-    const newName = ref<string>("");
+    const newName = ref<string>(props.imgName);
     
     const user = computed(() => userContext?.user.value);
     const toast = useToast();
