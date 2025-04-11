@@ -78,7 +78,7 @@ const navigateToImagePage=(e:Event)=> {
       </div>
     </div>
     <div class="flex justify-between items-center gap-2">
-      <div v-if="imgAuthor&&!isLoading" class="flex items-center gap-2 cursor-pointer" @click="router.push(`/users/${imgAuthor.id}`)">
+      <div v-if="imgAuthor" class="flex items-center gap-2 cursor-pointer" @click="router.push(`/users/${imgAuthor.id}`)">
         <img :src="imgAuthor.photoUrl" class="w-[1.6rem] rounded-full object-cover h-[1.6rem]" />
         <div class="flex gap-1 items-center">
           <p :class="[

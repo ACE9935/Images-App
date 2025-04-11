@@ -57,19 +57,14 @@ watch(() => route.params['id'], (newId) => {
   if (typeof newId === 'string') {
     window.scrollTo(0, 0)
     fetchData(newId);
+    if(user.value) {
+      addImageToViewed(user.value.id, String(newId));
+    }
   } else {
     console.error('Invalid image ID format');
     router.push("/404");
   }
 }, { immediate: true });
-
-watch(user, async (newUser) => {
-  if (newUser && imgData.value) {
-    await addImageToViewed(newUser.id, String(imgData.value.id));
-  }
-},
-  { immediate: true }
-);
 
 </script>
 

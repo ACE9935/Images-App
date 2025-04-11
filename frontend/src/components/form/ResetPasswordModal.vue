@@ -62,7 +62,7 @@ watch(
       </form>
     </div>
     </Dialog>
-    <span @click="visibleDialog=true" className="text-sm font-bold underline text-blue-500 cursor-pointer">Forgot password?</span>
+    <span @click="visibleDialog=true" class="text-sm font-bold underline text-blue-500 cursor-pointer">Forgot password?</span>
 </template>
 
 <style scoped>
