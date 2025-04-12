@@ -1,120 +1,122 @@
-# PDL - Recherche d'Images par Similarité
+# 📄 PDL - Image Similarity Search
 
-## Documentation d'Installation et de Test
+## 🛠 Installation and Testing Guide
 
-### Systèmes d'Exploitation Testés
-- **Serveur** : Ubuntu 20.04
+### ✅ Tested Operating Systems
+- **Server**: Ubuntu 20.04
 
-### Navigateurs Web Testés
-- **Client** : Firefox (version 128.7.0)
+### ✅ Tested Web Browsers
+- **Client**: Firefox (version 128.7.0)
 
 ---
 
-## Compilation et Exécution
+## ⚙️ Compilation and Execution
 
-### Backend
+### 🔧 Backend
 
-1. **Prérequis**  
-   - Java 17 ou supérieur
-   - Maven 3.6+
-   - PostgreSQL (configuration dans `application.properties`)
+1. **Prerequisites**  
+   - Java 17 or higher  
+   - Maven 3.6+  
+   - PostgreSQL (configured in `application.properties`)
 
-2. **Clonage du Projet**  
-   Cloner le projet avec :
+2. **Cloning the Project**  
    ```bash
    git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
    cd l1b/backend
    ```
 
 3. **Configuration**  
-   S'assurer que le fichier `src/main/resources/application.properties` contient les bonnes informations de connexion à la base de données PostgreSQL.
+   Ensure the file `src/main/resources/application.properties` contains the correct PostgreSQL connection info.
 
-4. **Compilation et Lancement**  
+4. **Build and Launch**  
    ```bash
    mvn clean install
    mvn spring-boot:run
    ```
-   Cela compile et démarre le serveur.
 
-5. **Exécution des Tests**  
-   Pour lancer les tests unitaires :
+5. **Running Tests**  
    ```bash
    mvn test
    ```
 
-### Frontend
+---
 
-1. **Prérequis**  
-   - Node.js 16+
+### 💻 Frontend
+
+1. **Prerequisites**  
+   - Node.js 16+  
    - npm 8+
 
-2. **Installation des Dépendances**  
+2. **Install Dependencies**  
    ```bash
    cd ../frontend
    npm install
    ```
 
-3. **Lancement du Client**  
+3. **Launch Client**  
    ```bash
    npm run dev
    ```
 
-4. **Exécution des Tests**  
+4. **Run Tests**  
    ```bash
    npm run test
    ```
 
 ---
 
-## API REST - Points d'Entrée Principaux
+## 🌐 REST API - Main Endpoints
 
-### Récupération de la Liste des Images
-- **Méthode** : `GET /images`
-- **Réponse** : JSON contenant les métadonnées des images indexées
+### Get Image List
+- **Method**: `GET /images`
+- **Response**: JSON containing metadata of indexed images
 
-### Ajout d'une Image
-- **Méthode** : `POST /images`
-- **Données** : Image envoyée en `multipart/form-data`
-- **Réponse** : `201 Created` si l'ajout est réussi
+### Add Image
+- **Method**: `POST /images`
+- **Payload**: Image sent as `multipart/form-data`
+- **Response**: `201 Created` if successful
 
-### Suppression d'une Image
-- **Méthode** : `DELETE /images/{id}`
-- **Réponse** : `200 OK` si la suppression est réussie
+### Delete Image
+- **Method**: `DELETE /images/{id}`
+- **Response**: `200 OK` if successfully deleted
 
-### Recherche d'Images Similaires
-- **Méthode** : `GET /images/id/similar?number=N&descriptor=DESCR`
-- **Données** : Identifiant de l'image
-- **Réponse** : JSON contenant les images les plus similaires et  leurs scores de similarité
+### Search for Similar Images
+- **Method**: `GET /images/id/similar?number=N&descriptor=DESCR`
 
+#### Query Parameters
+- `number` (int, optional): Number of similar images to return (default: `5`)  
+- `descriptor` (string, required): Descriptor type used (`histogram_2d`, `histogram_3d`, `histogram_of_visual_words`)
 
-#### Paramètres de requête
+#### Response
+- JSON with similar images and similarity scores
 
-Ce service accepte les paramètres suivants pour affiner la recherche :
+When using `histogram_of_visual_words`, the method uses a **Bag of Visual Words (BoVW)** model based on **k-means**:
 
-- **`number` (int, optionnel)** : Nombre d'images similaires à retourner (par défaut : `5`).  
-- **`descriptor` (string, requis)** : Type de descripteur utilisé pour la comparaison (`histogram_2d`, `histogram_3d`, `histogram_of_visual_words`).  
-
-#### Lorsqu'on utilise `histogram_of_visual_words`, la méthode repose sur un **modèle de sac de mots visuels (BoVW)** basé sur **k-means**. Voici les étapes principales :
-
-- **Extraction des caractéristiques locales** : Descripteurs importants sont extraits des images.
-- **Clustering avec k-means** : Ces descripteurs sont regroupés en `K` clusters représentant un vocabulaire visuel et stocké dans `/resources/visual_dictionary.dat`.
-- **Construction de l’histogramme** : Chaque image est représentée par un histogramme indiquant la fréquence des descripteurs dans chaque cluster.
-- **Comparaison des images** : La similarité entre images est calculée la distance euclidienne entre ces histogrammes.
+- **Feature Extraction**: Local descriptors are extracted from images.
+- **Clustering (k-means)**: Descriptors are clustered into `K` groups forming a visual vocabulary, stored in `/resources/visual_dictionary.dat`.
+- **Histogram Construction**: Each image is represented by a histogram indicating descriptor frequency in each cluster.
+- **Similarity Computation**: Based on Euclidean distance between histograms.
 
 ---
 
-## Clonage du Repository
+## 🧠 Image Classification with CIFAR-10 Labels
+
+Each image stored in the database is automatically **classified using a CNN-based AI model** built with **TensorFlow**. This model is trained on the **CIFAR-10** dataset.
+
+- **Predicted Labels**: `airplane`, `automobile`, `bird`, `cat`, `deer`, `dog`, `frog`, `horse`, `ship`, `truck`
+- **Pipeline**:
+  - Image is passed to the AI model upon upload
+  - Model predicts its class using convolutional layers
+  - Result is stored in the database for future use (e.g. filtering, analytics)
+
+---
+
+## 📁 Repository Cloning
 
 ### Via HTTPS
 ```bash
-git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
+git clone https://github.com/ACE9935/Images-App
 ```
 
-### Via SSH
-```bash
-git clone git@gitlab.emi.u-bordeaux.fr:pdl-l3/teams/2025/l1/l1b.git
-```
-
----
 
 
