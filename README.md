@@ -1,4 +1,4 @@
-# 📄 PDL - Image Similarity Search
+# 📄 Images App
 
 ## 🛠 Installation and Testing Guide
 
@@ -111,12 +111,42 @@ Each image stored in the database is automatically **classified using a CNN-base
 
 ---
 
+## 🔐 User Authentication and Account Management
+
+Authentication is handled via **Firebase Authentication**, providing secure and scalable login options.
+
+### Sign-In Options
+- **Email and password**
+- **Google account sign-in**
+
+### Account Features
+Once a user is authenticated and their **email is verified**, they gain access to the following features:
+
+- Upload images to the backend
+- Own a **public profile** showcasing all uploaded images
+- **Download images** (any public image can be downloaded by any user)
+- **Delete their own uploaded images** at any time
+- **Save images as favorites**
+- **Create albums** to organize images
+- **Track view history** of visited images
+
+### Account Deletion
+
+- Users can **safely delete their account** at any time
+- Deleting an account **does not delete the uploaded images**, which remain publicly available unless deleted manually by the user before account deletion
+
+---
+
 ## 📁 Repository Cloning
 
 ### Via HTTPS
 ```bash
-git clone https://github.com/ACE9935/Images-App
+git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
 ```
 
+### Via SSH
+```bash
+git clone git@gitlab.emi.u-bordeaux.fr:pdl-l3/teams/2025/l1/l1b.git
+```
 
 
