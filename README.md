@@ -144,9 +144,5 @@ Once a user is authenticated and their **email is verified**, they gain access t
 git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
 ```
 
-### Via SSH
-```bash
-git clone git@gitlab.emi.u-bordeaux.fr:pdl-l3/teams/2025/l1/l1b.git
-```
 
 
