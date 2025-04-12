@@ -21,7 +21,7 @@
 
 2. **Cloning the Project**  
    ```bash
-   git clone https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
+   git https://github.com/ACE9935/Images-App
    cd l1b/backend
    ```
 
