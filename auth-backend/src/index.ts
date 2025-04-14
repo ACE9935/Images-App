@@ -1,4 +1,3 @@
-// backend/index.js
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -9,19 +8,27 @@ import 'dotenv/config';
 
 const PORT = process.env.PORT || 5000;
 
-// Serve the React app’s build folder
-const app = express()
+const app = express();
 
-app.use(cors())
-app.use(express.json())
-customInitApp()
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CLIENT_HOST, // Allow only your frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
 
-// API routes can be defined here
-app.use("/api", router)
+app.use(cors(corsOptions));  // Use the CORS options for all routes
+app.use(express.json());
+customInitApp();
+
+// API routes
+app.use("/api", router);
 app.get("/", (req:Request, res:Response) => res.send("Images App is welcoming users!"));
-app.use("*", (req:Request, res:Response) => res.status(404).json({ error: "not found"}))
+app.use("*", (req:Request, res:Response) => res.status(404).json({ error: "not found"}));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
