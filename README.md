@@ -1,5 +1,7 @@
 # 📄 Images App
 
+### 🔗 [💻 Live Demo](https://images-app-production.up.railway.app/)
+
 ## 🛠 Installation and Testing Guide
 
 ### ✅ Tested Operating Systems
@@ -21,7 +23,7 @@
 
 2. **Cloning the Project**  
    ```bash
-   git https://github.com/ACE9935/Images-App
+   git https://gitlab.emi.u-bordeaux.fr/pdl-l3/teams/2025/l1/l1b.git
    cd l1b/backend
    ```
 
