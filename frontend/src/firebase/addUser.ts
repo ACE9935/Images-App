@@ -13,7 +13,6 @@ export async function addUser(user: User, provider: "Google" | "Email") {
     if (provider === "Email") {
       const response = await AuthServices.generateVerificationToken(user.email);
       const token = response?.data?.data;
-      console.log("Generated verification token:", token);
 
       if (!token) {
         throw new Error("Unable to sign in user: missing verification token");
