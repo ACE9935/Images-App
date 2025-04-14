@@ -32,7 +32,6 @@ export const doSignInWithEmailAndPassword = async (email:string, password:string
       await auth?.currentUser?.getIdToken()  // Pass 'true' if you want to force refresh the token
       .then((token) => {
         verificationAccessToken=token
-        console.log(verificationAccessToken)
       })
       .catch((error) => {
         console.error("Error getting token:", error);

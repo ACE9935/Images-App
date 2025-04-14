@@ -6,7 +6,7 @@
  <NoDataPlaceholder class="w-full max-w-[40rem]" v-if="users.length==0&&images.length==0"/>
     <div v-if="users.length>0" class="w-full max-w-[70rem] flex flex-col gap-2">
         <StyledHeading>Found Users: <span class="text-main">{{ users.length }}</span></StyledHeading>
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap">
             <div @click="router.push(`/users/${user.id}`)" v-for="user in users" class="flex flex-col gap-2 items-center p-2 cursor-pointer">
                 <img class="w-22 object-cover aspect-square rounded-full" :src="user.photoUrl"/>
                 <div class="text-md w-16 text-center font-semibold text-black">{{ user.userName }}</div>

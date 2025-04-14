@@ -57,7 +57,7 @@ watch(
 </script>
 
 <template>
-         <main class="min-h-screen bg-form text-black flex justify-center p-4">
+         <main class="min-h-screen bg-form text-black flex justify-center items-center p-4">
            
           <div class="bg-white h-fit pb-12 p-8 flex flex-col gap-6 pt-12 rounded-md shadow-lg w-full max-w-[28rem]">
             

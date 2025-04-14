@@ -29,7 +29,7 @@ export async function searchImages(searchTerm: string) {
       const titleMatch = image.title.toLowerCase().includes(lowerSearchTerm);
       const classMatch = image.imgClass?.toLowerCase().includes(lowerSearchTerm);
       return titleMatch || classMatch;
-    });
+    }).slice(0, 10);
 
     return matchingImages;
   } catch (error) {

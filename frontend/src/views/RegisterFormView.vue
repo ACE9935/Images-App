@@ -59,7 +59,7 @@ watch(
 
 <template>
    
-  <main class=" bg-form text-black flex justify-center p-4">
+  <main class="min-h-screen  bg-form text-black flex justify-center items-center p-4">
     <Dialog v-model:visible="visibleDialog" modal header="Verify your email" :style="{ width: '25rem' }">
      <div class="text-black flex flex-col gap-6 p-8 pt-2">
       <div class="flex self-end relative">

@@ -1,5 +1,7 @@
 import type { User } from "../types/UserInterface";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { auth } from "./firebase";
+import { deleteUser } from "firebase/auth";
 import { db } from "./firebase";
 import AuthServices from "../auth-services/services";
 
@@ -9,10 +11,13 @@ export async function addUser(user:User,provider:"Google"|"Email") {
         if(provider=="Email"){
 
             AuthServices.generateVerificationToken(user.email)
-            .then(response => {
-              
-              user={...user,verificationToken:response.data.data}
-            })
+            .then(async response => {
+                if(!response.data.data){
+                  await deleteUser(auth.currentUser!);
+                  throw Error("Unable to signin user")
+                }
+                user={...user,verificationToken:response.data.data}
+              })
             .catch(e => {
               console.log(e);
             });    

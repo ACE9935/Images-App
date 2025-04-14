@@ -20,7 +20,7 @@ export async function searchUsersByUsername(searchTerm: string): Promise<UserPre
           photoUrl: data.photoUrl,
         };
       })
-      .filter(user => user.userName.toLowerCase().includes(lowerSearch));
+      .filter(user => user.userName.toLowerCase().includes(lowerSearch)).slice(0, 5);
 
     return matchingUsers;
   } catch (error) {
