@@ -6,10 +6,10 @@ import { db } from "./firebase";
 import AuthServices from "../auth-services/services";
 
 export async function addUser(user:User,provider:"Google"|"Email") {
+    
     try {
         const collectionRef = collection(db, 'users'); 
         if(provider=="Email"){
-
             AuthServices.generateVerificationToken(user.email)
             .then(async response => {
                 if(!response.data.data){
